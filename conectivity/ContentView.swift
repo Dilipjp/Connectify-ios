@@ -6,19 +6,26 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
-    }
-}
+    @EnvironmentObject var firebaseService: FirebaseService
 
-#Preview {
-    ContentView()
+    var body: some View {
+        Group {
+            if firebaseService.isLoggedIn {
+                HomeView() // User is logged in, navigate to Home
+            } else {
+                SignInView() // User is not logged in, navigate to Sign-In
+            }
+        }
+        .onAppear {
+            checkAuthStatus()
+        }
+    }
+
+    // Function to check the authentication status and redirect accordingly
+    func checkAuthStatus() {
+        firebaseService.isLoggedIn = Auth.auth().currentUser != nil
+    }
 }
