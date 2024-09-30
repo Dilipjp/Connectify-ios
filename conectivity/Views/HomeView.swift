@@ -9,10 +9,35 @@ import SwiftUI
 
 struct HomeView: View {
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        TabView {
+            HomeScreen()  // Use the renamed HomeScreen
+                .tabItem {
+                    Label("Home", systemImage: "house.fill")
+                }
+
+            FollowersScreen()  // Use the renamed FollowersScreen
+                .tabItem {
+                    Label("Followers", systemImage: "person.2.fill")
+                }
+
+            PostScreen()  // Use the renamed PostScreen
+                .tabItem {
+                    Label("Post", systemImage: "plus.circle.fill")
+                }
+
+            ProfileScreen()  // Use the renamed ProfileScreen
+                .tabItem {
+                    Label("Profile", systemImage: "person.crop.circle.fill")
+                }
+        }
     }
 }
 
-#Preview {
-    HomeView()
+struct HomeView_Previews: PreviewProvider {
+    static var previews: some View {
+        HomeView()
+    }
 }
+
+
+

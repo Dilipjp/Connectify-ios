@@ -7,12 +7,17 @@
 
 import SwiftUI
 
-struct FollowersTab: View {
+struct FollowersScreen: View {  // Rename to FollowersScreen
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack {
+            Text("Followers Page")
+        }
     }
 }
 
-#Preview {
-    FollowersTab()
+struct FollowersScreen_Previews: PreviewProvider {
+    static var previews: some View {
+        FollowersScreen()
+    }
 }
+
