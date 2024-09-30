@@ -8,11 +8,27 @@
 import SwiftUI
 
 struct ForgotPasswordView: View {
+    @State private var email = ""
+    @State private var errorMessage = ""
+    @EnvironmentObject var firebaseService: FirebaseService
+
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack {
+            TextField("Email", text: $email)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+
+            Button("Send Password Reset") {
+                firebaseService.sendPasswordReset(email: email) { success, error in
+                    if !success {
+                        errorMessage = error?.localizedDescription ?? "Error"
+                    }
+                }
+            }
+
+            Text(errorMessage)
+                .foregroundColor(.red)
+        }
+        .padding()
     }
 }
 
-#Preview {
-    ForgotPasswordView()
-}
