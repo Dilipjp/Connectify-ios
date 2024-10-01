@@ -26,18 +26,18 @@ struct HomeScreen: View {
                                     // Profile Image
                                     Image(uiImage: userData.profileImage)
                                         .resizable()
-                                        .scaledToFill()  // Ensures the image fills the frame and is cropped
-                                        .frame(width: 40, height: 40)  // Ensure square frame
-                                        .clipShape(Circle())  // Clips the image into a perfect circle
+                                        .scaledToFill()
+                                        .frame(width: 40, height: 40)
+                                        .clipShape(Circle())
                                         .overlay(Circle().stroke(Color.gray, lineWidth: 1))  // Optional: Add a border to the circle
-                                        .padding(5)// Round profile image
+                                        .padding(5)
 
                                     // Username
                                     Text(userData.userName)
                                         .font(.headline)
-                                        .padding(.leading, 8) // Space between image and name
-                                    
-                                    Spacer()  // Pushes content to the left, if needed for alignment
+                                        .padding(.leading, 8)
+
+                                    Spacer()
                                 }
                                 .padding(.horizontal, 10)
                                 .padding(.top, 5)
@@ -56,6 +56,56 @@ struct HomeScreen: View {
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
 
+                            // Like, Comment, Share Icons with Count
+                            HStack {
+                                Button(action: {
+                                    // Like action
+                                }) {
+                                    HStack {
+                                        Image(systemName: "heart")
+                                            .resizable()
+                                            .frame(width: 24, height: 24)
+                                            .foregroundColor(.black)
+                                        // Like Count
+                                        Text("\(posts[index].likeCount)")
+                                            .font(.subheadline)
+                                            .padding(.leading, 4)
+                                            .foregroundColor(.black)
+                                    }
+                                }
+                                .padding(.leading, 10)
+
+                                Button(action: {
+                                    // Comment action
+                                }) {
+                                    HStack {
+                                        Image(systemName: "message")
+                                            .resizable()
+                                            .frame(width: 24, height: 24)
+                                            .foregroundColor(.black)
+                                        // Comment Count
+                                        Text("\(posts[index].commentCount)")
+                                            .font(.subheadline)
+                                            .padding(.leading, 4)
+                                            .foregroundColor(.black)
+                                    }
+                                }
+                                .padding(.leading, 10)
+                                
+                                Button(action: {
+                                    // Share action
+                                }) {
+                                    Image(systemName: "paperplane")
+                                        .resizable()
+                                        .frame(width: 24, height: 24)
+                                        .foregroundColor(.black)
+                                }
+                                .padding(.leading, 10)
+                                
+                            }
+                            .padding(.top, 5)
+                            .padding(.bottom, 10)
+
                             // Post Caption
                             Text(posts[index].caption)
                                 .padding(.horizontal, 10)
@@ -68,7 +118,7 @@ struct HomeScreen: View {
                 }
                 .padding(.horizontal)
             }
-            .navigationTitle("Home")
+            .navigationTitle("Connectify")
         }
         .onAppear {
             fetchPosts()  // Fetch posts when the view appears
@@ -85,8 +135,10 @@ struct HomeScreen: View {
                    let postId = dict["postId"] as? String,
                    let userId = dict["userId"] as? String,
                    let postImageUrl = dict["postImageUrl"] as? String,
-                   let caption = dict["caption"] as? String {
-                    let post = Post(postId: postId, userId: userId, postImageUrl: postImageUrl, caption: caption)
+                   let caption = dict["caption"] as? String,
+                   let likeCount = dict["likeCount"] as? Int,    // Fetch like count
+                   let commentCount = dict["commentCount"] as? Int { // Fetch comment count
+                    let post = Post(postId: postId, userId: userId, postImageUrl: postImageUrl, caption: caption, likeCount: likeCount, commentCount: commentCount)
                     newPosts.append(post)
                 }
             }
@@ -126,6 +178,8 @@ struct Post: Identifiable {
     let userId: String
     let postImageUrl: String
     let caption: String
+    let likeCount: Int
+    let commentCount: Int
     var userData: UserData?  // Optional to store user data
 }
 
@@ -134,6 +188,8 @@ struct UserData {
     let userName: String
     let profileImage: UIImage
 }
+
+
 
 
 
