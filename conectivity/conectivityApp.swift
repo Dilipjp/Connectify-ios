@@ -7,11 +7,20 @@
 
 import SwiftUI
 
+import Firebase
+
 @main
 struct conectivityApp: App {
+    @StateObject var firebaseService = FirebaseService()
+
+    init() {
+        FirebaseApp.configure()
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(firebaseService)
         }
     }
 }
