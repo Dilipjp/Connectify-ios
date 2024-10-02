@@ -15,6 +15,7 @@ struct PostScreen: View {
     @State private var isImagePickerPresented = false
     @State private var isLoading = false
     @State private var successMessage: String? = nil
+    var postId: String
 
     var body: some View {
         VStack(spacing: 20) {
@@ -75,6 +76,9 @@ struct PostScreen: View {
                     .foregroundColor(.green)
                     .padding()
             }
+            
+        
+            
 
             Spacer()
         }
