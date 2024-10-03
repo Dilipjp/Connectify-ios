@@ -20,7 +20,7 @@ struct HomeView: View {
                     Label("Followers", systemImage: "person.2.fill")
                 }
 
-            PostScreen()  // Use the renamed PostScreen
+            PostScreen(postId: <#String#>, userId: <#String#>, username: <#String#>)  // Use the renamed PostScreen
                 .tabItem {
                     Label("Post", systemImage: "plus.circle.fill")
                 }
