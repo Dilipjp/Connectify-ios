@@ -14,6 +14,8 @@ struct LikeView: View {
             }) {
                 Image(systemName: isLiked ? "heart.fill" : "heart")
                     .foregroundColor(isLiked ? .red : .gray)
+                    .scaleEffect(isLiked ? 1.2 : 1.0) // Optional: Scale effect on like
+                    .animation(.easeInOut, value: isLiked) // Optional: Animation
             }
             Text("\(likesCount)")
                 .font(.subheadline)
@@ -60,12 +62,17 @@ struct LikeView: View {
                 post["likes"] = likes
                 post["likedBy"] = likedBy
                 currentData.value = post
+                
                 DispatchQueue.main.async {
                     self.likesCount = likes
                 }
                 return TransactionResult.success(withValue: currentData)
             }
             return TransactionResult.success(withValue: currentData)
+        } andCompletionBlock: { error, _, _ in
+            if let error = error {
+                print("Error toggling like: \(error.localizedDescription)") // Handle the error accordingly
+            }
         }
     }
 }
