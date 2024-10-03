@@ -15,7 +15,13 @@ struct PostScreen: View {
     @State private var isImagePickerPresented = false
     @State private var isLoading = false
     @State private var successMessage: String? = nil
+    @State private var comments: [Comment] = []
+    
     var postId: String
+    var userId: String
+    var username: String
+
+    @EnvironmentObject var firebaseService: FirebaseService
 
     var body: some View {
         VStack(spacing: 20) {
@@ -76,16 +82,36 @@ struct PostScreen: View {
                     .foregroundColor(.green)
                     .padding()
             }
-            
-        
-            
 
             Spacer()
+            
+            // Comments Section
+            if isLoading {
+                ProgressView()
+            } else {
+                List(comments) { comment in
+                    VStack(alignment: .leading) {
+                        Text(comment.username).fontWeight(.bold)
+                        Text(comment.text)
+                        Text("Just now") // Replace with proper timestamp formatting
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                    }
+                }
+            }
+
+            // Comment Input
+            CommentInputView(postId: postId, userId: userId, username: username) {
+                fetchComments() // Refresh comments after posting
+            }
+            .padding()
         }
-        .padding()
+        .onAppear {
+            fetchComments()
+        }
     }
 
-    func savePost() {
+    private func savePost() {
         guard let user = Auth.auth().currentUser,
               let image = postImage,
               let imageData = image.jpegData(compressionQuality: 0.8) else {
@@ -152,9 +178,12 @@ struct PostScreen: View {
             }
         }
     }
+
+    private func fetchComments() {
+        isLoading = true
+        firebaseService.fetchComments(for: postId) { comments, error in
+            self.comments = comments
+            self.isLoading = false
+        }
+    }
 }
-
-
-
-
-
