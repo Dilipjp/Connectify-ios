@@ -84,5 +84,35 @@ class FirebaseService: ObservableObject {
     func saveUserData(userId: String, data: [String: Any]) {
         dbRef.child("users").child(userId).setValue(data)
     }
+    func likePost(postId: String, userId: String, completion: @escaping (Error?) -> Void) {
+        let ref = Database.database().reference()
+        let postRef = ref.child("posts").child(postId)
+
+        postRef.runTransactionBlock { (currentData) -> TransactionResult in
+            if var post = currentData.value as? [String: Any] {
+                var likes = post["likes"] as? Int ?? 0
+                var likedBy = post["likedBy"] as? [String: Bool] ?? [:]
+
+                if likedBy[userId] == nil {
+                    // User has not liked the post yet
+                    likes += 1
+                    likedBy[userId] = true
+                } else {
+                    // User has already liked the post
+                    likes -= 1
+                    likedBy.removeValue(forKey: userId)
+                }
+
+                post["likes"] = likes
+                post["likedBy"] = likedBy
+
+                currentData.value = post
+                return TransactionResult.success(withValue: currentData)
+            }
+            return TransactionResult.success(withValue: currentData)
+        } andCompletionBlock: { error, _, _ in
+            completion(error)
+        }
+    }
 }
 

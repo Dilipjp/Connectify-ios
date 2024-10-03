@@ -1,31 +1,24 @@
-//
-//  HomeView.swift
-//  conectivity
-//
-//  Created by Dilip on 2024-09-29.
-//
-
 import SwiftUI
 
 struct HomeView: View {
     var body: some View {
         TabView {
-            HomeScreen()  // Use the renamed HomeScreen
+            HomeScreen() // Use the renamed HomeScreen
                 .tabItem {
                     Label("Home", systemImage: "house.fill")
                 }
 
-            FollowersScreen()  // Use the renamed FollowersScreen
+            FollowersScreen() // Use the renamed FollowersScreen
                 .tabItem {
                     Label("Followers", systemImage: "person.2.fill")
                 }
 
-            PostScreen()  // Use the renamed PostScreen
+            PostScreen() // Corrected: No need to pass samplePost as `PostScreen` is for creating a post
                 .tabItem {
                     Label("Post", systemImage: "plus.circle.fill")
                 }
 
-            ProfileScreen()  // Use the renamed ProfileScreen
+            ProfileScreen() // Use the renamed ProfileScreen
                 .tabItem {
                     Label("Profile", systemImage: "person.crop.circle.fill")
                 }
@@ -38,6 +31,3 @@ struct HomeView_Previews: PreviewProvider {
         HomeView()
     }
 }
-
-
-

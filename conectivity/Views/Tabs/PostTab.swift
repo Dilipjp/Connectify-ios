@@ -9,12 +9,23 @@ import Firebase
 import FirebaseStorage
 import FirebaseAuth
 
+
+struct UserPost:Identifiable{
+    var id: String
+    var content: String
+    var likes: Int
+    var likedBy: [String]
+}
+
 struct PostScreen: View {
     @State private var caption: String = ""
     @State private var postImage: UIImage? = nil
     @State private var isImagePickerPresented = false
     @State private var isLoading = false
     @State private var successMessage: String? = nil
+    @State private var isLiked = false
+    @State private var likeCount = 0
+    
 
     var body: some View {
         VStack(spacing: 20) {

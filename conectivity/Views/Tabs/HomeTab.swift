@@ -1,16 +1,10 @@
-//
-//  HomeTab.swift
-//  conectivity
-//
-//  Created by Dilip on 2024-09-29.
-//
 import SwiftUI
 import Firebase
 import FirebaseDatabase
 
 struct HomeScreen: View {
     @State private var posts: [Post] = []
-    
+
     // Reference to the Firebase Realtime Database
     private var dbRef = Database.database().reference()
 
@@ -30,7 +24,7 @@ struct HomeScreen: View {
                                         .frame(width: 40, height: 40)  // Ensure square frame
                                         .clipShape(Circle())  // Clips the image into a perfect circle
                                         .overlay(Circle().stroke(Color.gray, lineWidth: 1))  // Optional: Add a border to the circle
-                                        .padding(5)// Round profile image
+                                        .padding(5) // Round profile image
 
                                     // Username
                                     Text(userData.userName)
@@ -60,6 +54,23 @@ struct HomeScreen: View {
                             Text(posts[index].caption)
                                 .padding(.horizontal, 10)
                                 .padding(.bottom, 10)
+
+                            // Like Button and Count
+                            HStack {
+                                Button(action: {
+                                    toggleLike(for: index)
+                                }) {
+                                    Image(systemName: posts[index].isLiked ? "heart.fill" : "heart")
+                                        .foregroundColor(posts[index].isLiked ? .red : .gray)
+                                        .padding(.leading, 10)
+                                }
+                                
+                                Text("\(posts[index].likeCount) likes")
+                                    .padding(.leading, 5)
+
+                                Spacer()
+                            }
+                            .padding(.bottom, 10)
                         }
                         .background(Color.white)
                         .cornerRadius(10)
@@ -85,8 +96,10 @@ struct HomeScreen: View {
                    let postId = dict["postId"] as? String,
                    let userId = dict["userId"] as? String,
                    let postImageUrl = dict["postImageUrl"] as? String,
-                   let caption = dict["caption"] as? String {
-                    let post = Post(postId: postId, userId: userId, postImageUrl: postImageUrl, caption: caption)
+                   let caption = dict["caption"] as? String,
+                   let likeCount = dict["likeCount"] as? Int,
+                   let isLiked = dict["isLiked"] as? Bool {
+                    let post = Post(postId: postId, userId: userId, postImageUrl: postImageUrl, caption: caption, likeCount: likeCount, isLiked: isLiked)
                     newPosts.append(post)
                 }
             }
@@ -117,25 +130,27 @@ struct HomeScreen: View {
             }
         }
     }
+
+    // Toggle like status for a specific post
+    func toggleLike(for index: Int) {
+        guard index < posts.count else { return }
+        
+        // Update the like status in Firebase
+        let post = posts[index]
+        let updatedLikeCount = post.isLiked ? post.likeCount - 1 : post.likeCount + 1
+        let isLiked = !post.isLiked
+
+        dbRef.child("posts").child(post.postId).updateChildValues([
+            "likeCount": updatedLikeCount,
+            "isLiked": isLiked
+        ]) { error, _ in
+            if error == nil {
+                // Update the local state of posts
+                DispatchQueue.main.async {
+                    self.posts[index].likeCount = updatedLikeCount
+                    self.posts[index].isLiked = isLiked
+                }
+            }
+        }
+    }
 }
-
-// Post model
-struct Post: Identifiable {
-    let id = UUID()
-    let postId: String
-    let userId: String
-    let postImageUrl: String
-    let caption: String
-    var userData: UserData?  // Optional to store user data
-}
-
-// User data model
-struct UserData {
-    let userName: String
-    let profileImage: UIImage
-}
-
-
-
-
-
