@@ -55,7 +55,18 @@ struct HomeScreen: View {
                             }
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
-
+                            HStack{
+                                
+                                Button(action: {
+                                                                   // Share action
+                                                               }) {
+                                                                   Image(systemName: "paperplane")
+                                                                       .resizable()
+                                                                       .frame(width: 24, height: 24)
+                                                                       .foregroundColor(.black)
+                                                               }
+                                                               .padding(.leading, 10)
+                            }
                             // Post Caption
                             Text(posts[index].caption)
                                 .padding(.horizontal, 10)
