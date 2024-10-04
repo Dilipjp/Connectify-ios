@@ -22,7 +22,7 @@ struct ProfileScreen: View {
     private var dbRef = Database.database().reference()
 
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 20) {   
             if isLoading {
                 ProgressView("Updating...")
             } else {

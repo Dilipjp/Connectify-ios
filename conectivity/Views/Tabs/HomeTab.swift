@@ -30,7 +30,7 @@ struct HomeScreen: View {
                                         .frame(width: 40, height: 40)  // Ensure square frame
                                         .clipShape(Circle())  // Clips the image into a perfect circle
                                         .overlay(Circle().stroke(Color.gray, lineWidth: 1))  // Optional: Add a border to the circle
-                                        .padding(5)// Round profile image
+                                        .padding(5) // Round profile image
 
                                     // Username
                                     Text(userData.userName)
@@ -60,6 +60,20 @@ struct HomeScreen: View {
                             Text(posts[index].caption)
                                 .padding(.horizontal, 10)
                                 .padding(.bottom, 10)
+                            
+                            // Comments Section
+                            ForEach(posts[index].comments, id: \.id) { comment in
+                                VStack(alignment: .leading) {
+                                    Text(comment.username).fontWeight(.bold)
+                                    Text(comment.text)
+                                        .font(.subheadline)
+                                    Text("Just now") // You might want to format the timestamp
+                                        .font(.caption)
+                                        .foregroundColor(.gray)
+                                }
+                                .padding(.horizontal, 10)
+                                .padding(.bottom, 5)
+                            }
                         }
                         .background(Color.white)
                         .cornerRadius(10)
@@ -86,12 +100,40 @@ struct HomeScreen: View {
                    let userId = dict["userId"] as? String,
                    let postImageUrl = dict["postImageUrl"] as? String,
                    let caption = dict["caption"] as? String {
-                    let post = Post(postId: postId, userId: userId, postImageUrl: postImageUrl, caption: caption)
+                    let post = Post(postId: postId, userId: userId, postImageUrl: postImageUrl, caption: caption, comments: []) // Initialize with an empty comments array
                     newPosts.append(post)
                 }
             }
             self.posts = newPosts
             fetchUserDetails(for: newPosts)
+
+            // After fetching posts, fetch comments for each post
+            for post in newPosts {
+                fetchComments(for: post.postId) { comments in
+                    if let index = newPosts.firstIndex(where: { $0.postId == post.postId }) {
+                        newPosts[index].comments = comments // Update the comments for the post
+                    }
+                }
+            }
+        }
+    }
+
+    // Fetch comments for a specific post
+    func fetchComments(for postId: String, completion: @escaping ([Comment]) -> Void) {
+        dbRef.child("comments").child(postId).observe(.value) { snapshot in
+            var comments: [Comment] = []
+            for child in snapshot.children {
+                if let snapshot = child as? DataSnapshot,
+                   let dict = snapshot.value as? [String: Any],
+                   let userId = dict["userId"] as? String,
+                   let username = dict["username"] as? String,
+                   let text = dict["text"] as? String,
+                   let timestamp = dict["timestamp"] as? TimeInterval {
+                    let comment = Comment(id: snapshot.key, postId: postId, userId: userId, username: username, text: text, timestamp: timestamp)
+                    comments.append(comment)
+                }
+            }
+            completion(comments) // Pass comments back to the caller
         }
     }
 
@@ -118,24 +160,4 @@ struct HomeScreen: View {
         }
     }
 }
-
-// Post model
-struct Post: Identifiable {
-    let id = UUID()
-    let postId: String
-    let userId: String
-    let postImageUrl: String
-    let caption: String
-    var userData: UserData?  // Optional to store user data
-}
-
-// User data model
-struct UserData {
-    let userName: String
-    let profileImage: UIImage
-}
-
-
-
-
 

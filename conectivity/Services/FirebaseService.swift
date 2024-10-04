@@ -20,7 +20,7 @@ class FirebaseService: ObservableObject {
                 completion(true, nil)
             } else {
                 self.isLoggedIn = false
-                completion(false, error)  // Pass the error object directly
+                completion(false, error)
             }
         }
     }
@@ -39,10 +39,10 @@ class FirebaseService: ObservableObject {
                 ]
                 
                 self.dbRef.child("users").child(user.uid).setValue(userData) { error, _ in
-                    completion(error == nil, error)  // Pass the error object directly
+                    completion(error == nil, error)
                 }
             } else {
-                completion(false, error)  // Pass the error object directly
+                completion(false, error)
             }
         }
     }
@@ -50,7 +50,7 @@ class FirebaseService: ObservableObject {
     func sendPasswordReset(email: String, completion: @escaping (Bool, Error?) -> Void) {
         Auth.auth().sendPasswordReset(withEmail: email) { error in
             if let error = error {
-                completion(false, error)  // Pass the error object directly
+                completion(false, error)
             } else {
                 completion(true, nil)
             }
@@ -63,16 +63,18 @@ class FirebaseService: ObservableObject {
     }
     
     func fetchUserData(completion: @escaping (DataSnapshot?, Error?) -> Void) {
-            dbRef.child("users").observeSingleEvent(of: .value) { snapshot in
-                if snapshot.exists() {
-                    completion(snapshot, nil)
-                } else {
-                    completion(nil, NSError(domain: "", code: 404, userInfo: [NSLocalizedDescriptionKey: "User data not found"]))
-                }
-            } withCancel: { error in
-                completion(nil, error)  // Pass the error object directly
+        dbRef.child("users").observeSingleEvent(of: .value, with: { snapshot in
+            if snapshot.exists() {
+                completion(snapshot, nil)
+            } else {
+                completion(nil, NSError(domain: "", code: 404, userInfo: [NSLocalizedDescriptionKey: "User data not found"]))
             }
+        }) { error in
+            completion(nil, error)
         }
+    }
+
+    
     func saveUserData(userId: String, data: [String: Any]) {
         dbRef.child("users").child(userId).setValue(data)
     }
@@ -89,20 +91,33 @@ class FirebaseService: ObservableObject {
             "text": text,
             "timestamp": comment.timestamp
         ]) { error, _ in
-            completion(error == nil, error)  // Pass the error object directly
+            completion(error == nil, error)
         }
     }
-    
     func fetchComments(for postId: String, completion: @escaping ([Comment], Error?) -> Void) {
-        dbRef.child("comments").child(postId).observeSingleEvent(of: .value) { snapshot in
+        dbRef.child("comments").child(postId).getData { error, snapshot in
+            // Initialize an empty array to store comments
             var comments: [Comment] = []
             
-            // Iterate through the children of the snapshot
-            for child in snapshot.children {
-                if let childSnapshot = child as? DataSnapshot,
-                   let value = childSnapshot.value as? [String: Any] {
+            // Check if there was an error fetching the data
+            if let error = error {
+                completion([], error)  // Return an empty array and the error
+                return
+            }
+            
+            // Ensure the snapshot is not nil and has children
+            guard let snapshot = snapshot, snapshot.childrenCount > 0 else {
+                // Handle the case where there are no comments found
+                let noCommentsError = NSError(domain: "", code: 404, userInfo: [NSLocalizedDescriptionKey: "No comments found for this post."])
+                completion([], noCommentsError)
+                return
+            }
+            
+            // Iterate through the snapshot's children
+            for child in snapshot.children.allObjects as! [DataSnapshot] {
+                if let value = child.value as? [String: Any] {
                     let comment = Comment(
-                        id: childSnapshot.key,
+                        id: child.key,
                         postId: postId,
                         userId: value["userId"] as? String ?? "",
                         username: value["username"] as? String ?? "",
@@ -112,11 +127,17 @@ class FirebaseService: ObservableObject {
                     comments.append(comment)
                 }
             }
-
-            completion(comments, nil)  // Return comments and no error
-        } withCancel: { error in
-            completion([], error)  // Return an empty array and the error
+            
+            // Return the list of comments and no error
+            completion(comments, nil)
         }
     }
 
-    }
+    
+  
+
+
+
+
+
+}
