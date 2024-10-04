@@ -10,6 +10,9 @@ import FirebaseDatabase
 
 struct HomeScreen: View {
     @State private var posts: [Post] = []
+    @State private var postUrl: String = ""
+       @State private var caption: String = "Check out this post!"
+       
     
     // Reference to the Firebase Realtime Database
     private var dbRef = Database.database().reference()
@@ -18,10 +21,10 @@ struct HomeScreen: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
-                    ForEach(posts.indices, id: \.self) { index in
+                    ForEach(posts) { post in
                         VStack(alignment: .leading, spacing: 10) {
                             // User Profile Image and Name in a Horizontal Stack (HStack)
-                            if let userData = posts[index].userData {
+                            if let userData = post.userData {
                                 HStack(alignment: .center) {
                                     // Profile Image
                                     Image(uiImage: userData.profileImage)
@@ -44,7 +47,7 @@ struct HomeScreen: View {
                             }
 
                             // Post Image
-                            AsyncImage(url: URL(string: posts[index].postImageUrl)) { image in
+                            AsyncImage(url: URL(string: post.postImageUrl)) { image in
                                 image
                                     .resizable()
                                     .scaledToFit()
@@ -58,17 +61,17 @@ struct HomeScreen: View {
                             HStack{
                                 
                                 Button(action: {
-                                                                   // Share action
-                                                               }) {
-                                                                   Image(systemName: "paperplane")
-                                                                       .resizable()
-                                                                       .frame(width: 24, height: 24)
-                                                                       .foregroundColor(.black)
-                                                               }
-                                                               .padding(.leading, 10)
+                                    sharePost(imageUrl: post.postImageUrl, caption: post.caption)
+                                        }) {
+                                        Image(systemName: "paperplane")
+                                            .resizable()
+                                            .frame(width: 24, height: 24)
+                                            .foregroundColor(.black)
+                                    }
+                                    .padding(.leading, 10)
                             }
                             // Post Caption
-                            Text(posts[index].caption)
+                            Text(post   .caption)
                                 .padding(.horizontal, 10)
                                 .padding(.bottom, 10)
                         }
@@ -128,6 +131,15 @@ struct HomeScreen: View {
             }
         }
     }
+    func sharePost(imageUrl: String, caption: String) {
+        let textToShare = caption + "\n" + imageUrl
+           let activityVC = UIActivityViewController(activityItems: [textToShare], applicationActivities: nil)
+
+           // Present the share sheet
+           if let topController = UIApplication.shared.windows.first?.rootViewController {
+               topController.present(activityVC, animated: true, completion: nil)
+           }
+       }
 }
 
 // Post model
