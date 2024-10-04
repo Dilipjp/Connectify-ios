@@ -1,5 +1,5 @@
 //
-//  HomeTab.swift
+//  HomeScreen.swift
 //  conectivity
 //
 //  Created by Dilip on 2024-09-29.
@@ -18,33 +18,33 @@ struct HomeScreen: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
-                    ForEach(posts.indices, id: \.self) { index in
+                    ForEach(posts) { post in
                         VStack(alignment: .leading, spacing: 10) {
                             // User Profile Image and Name in a Horizontal Stack (HStack)
-                            if let userData = posts[index].userData {
+                            if let userData = post.userData {
                                 HStack(alignment: .center) {
                                     // Profile Image
                                     Image(uiImage: userData.profileImage)
                                         .resizable()
-                                        .scaledToFill()  // Ensures the image fills the frame and is cropped
-                                        .frame(width: 40, height: 40)  // Ensure square frame
-                                        .clipShape(Circle())  // Clips the image into a perfect circle
-                                        .overlay(Circle().stroke(Color.gray, lineWidth: 1))  // Optional: Add a border to the circle
-                                        .padding(5) // Round profile image
+                                        .scaledToFill()
+                                        .frame(width: 40, height: 40)
+                                        .clipShape(Circle())
+                                        .overlay(Circle().stroke(Color.gray, lineWidth: 1))
+                                        .padding(5)
 
                                     // Username
                                     Text(userData.userName)
                                         .font(.headline)
-                                        .padding(.leading, 8) // Space between image and name
-                                    
-                                    Spacer()  // Pushes content to the left, if needed for alignment
+                                        .padding(.leading, 8)
+
+                                    Spacer()
                                 }
                                 .padding(.horizontal, 10)
                                 .padding(.top, 5)
                             }
 
                             // Post Image
-                            AsyncImage(url: URL(string: posts[index].postImageUrl)) { image in
+                            AsyncImage(url: URL(string: post.postImageUrl)) { image in
                                 image
                                     .resizable()
                                     .scaledToFit()
@@ -57,12 +57,12 @@ struct HomeScreen: View {
                             .padding(.vertical, 5)
 
                             // Post Caption
-                            Text(posts[index].caption)
+                            Text(post.caption)
                                 .padding(.horizontal, 10)
                                 .padding(.bottom, 10)
-                            
+
                             // Comments Section
-                            ForEach(posts[index].comments, id: \.id) { comment in
+                            ForEach(post.comments) { comment in
                                 VStack(alignment: .leading) {
                                     Text(comment.username).fontWeight(.bold)
                                     Text(comment.text)
@@ -91,67 +91,65 @@ struct HomeScreen: View {
 
     // Fetch posts from Firebase Realtime Database
     func fetchPosts() {
-        dbRef.child("posts").observe(.value) { snapshot in
+        dbRef.child("posts").observeSingleEvent(of: .value) { snapshot in
             var newPosts: [Post] = []
             for child in snapshot.children {
                 if let snapshot = child as? DataSnapshot,
                    let dict = snapshot.value as? [String: Any],
-                   let postId = dict["postId"] as? String,
+                   let postId = snapshot.key as? String,
                    let userId = dict["userId"] as? String,
                    let postImageUrl = dict["postImageUrl"] as? String,
                    let caption = dict["caption"] as? String {
-                    let post = Post(postId: postId, userId: userId, postImageUrl: postImageUrl, caption: caption, comments: []) // Initialize with an empty comments array
+                    
+                    var comments: [Comment] = []
+
+                    // Fetch comments from the nested structure
+                    if let commentsDict = dict["comments"] as? [String: Any] {
+                        for (commentId, commentData) in commentsDict {
+                            if let commentDict = commentData as? [String: Any],
+                               let userId = commentDict["userId"] as? String,
+                               let username = commentDict["username"] as? String,
+                               let text = commentDict["text"] as? String,
+                               let timestamp = commentDict["timestamp"] as? TimeInterval {
+                                let comment = Comment(id: commentId, postId: postId, userId: userId, username: username, text: text, timestamp: timestamp)
+                                comments.append(comment)
+                            }
+                        }
+                    }
+
+                    let post = Post(postId: postId, userId: userId, postImageUrl: postImageUrl, caption: caption, comments: comments)
                     newPosts.append(post)
                 }
             }
             self.posts = newPosts
             fetchUserDetails(for: newPosts)
-
-            // After fetching posts, fetch comments for each post
-            for post in newPosts {
-                fetchComments(for: post.postId) { comments in
-                    if let index = newPosts.firstIndex(where: { $0.postId == post.postId }) {
-                        newPosts[index].comments = comments // Update the comments for the post
-                    }
-                }
-            }
-        }
-    }
-
-    // Fetch comments for a specific post
-    func fetchComments(for postId: String, completion: @escaping ([Comment]) -> Void) {
-        dbRef.child("comments").child(postId).observe(.value) { snapshot in
-            var comments: [Comment] = []
-            for child in snapshot.children {
-                if let snapshot = child as? DataSnapshot,
-                   let dict = snapshot.value as? [String: Any],
-                   let userId = dict["userId"] as? String,
-                   let username = dict["username"] as? String,
-                   let text = dict["text"] as? String,
-                   let timestamp = dict["timestamp"] as? TimeInterval {
-                    let comment = Comment(id: snapshot.key, postId: postId, userId: userId, username: username, text: text, timestamp: timestamp)
-                    comments.append(comment)
-                }
-            }
-            completion(comments) // Pass comments back to the caller
         }
     }
 
     // Fetch user details for each post from Firebase
     func fetchUserDetails(for posts: [Post]) {
         for (index, post) in posts.enumerated() {
-            dbRef.child("users").child(post.userId).observeSingleEvent(of: .value) { snapshot in
-                if let userDict = snapshot.value as? [String: Any],
-                   let userName = userDict["userName"] as? String,
+            dbRef.child("users").child(post.userId).getData { error, snapshot in
+                if let error = error {
+                    print("Error fetching user data for userId \(post.userId): \(error.localizedDescription)")
+                    return
+                }
+                
+                guard let userDict = snapshot?.value as? [String: Any] else {
+                    print("No user data available for userId: \(post.userId)")
+                    return
+                }
+
+                if let userName = userDict["userName"] as? String,
                    let userProfileImage = userDict["userProfileImage"] as? String,
                    let imageUrl = URL(string: userProfileImage) {
                     
-                    // Load the profile image asynchronously
                     URLSession.shared.dataTask(with: imageUrl) { data, response, error in
                         if let data = data, let image = UIImage(data: data) {
                             DispatchQueue.main.async {
-                                // Update the specific post with user data
-                                self.posts[index].userData = UserData(userName: userName, profileImage: image)
+                                if index < self.posts.count {
+                                    self.posts[index].userData = UserData(userName: userName, profileImage: image)
+                                }
                             }
                         }
                     }.resume()
@@ -160,4 +158,3 @@ struct HomeScreen: View {
         }
     }
 }
-

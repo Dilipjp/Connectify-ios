@@ -74,28 +74,31 @@ class FirebaseService: ObservableObject {
         }
     }
 
-    
     func saveUserData(userId: String, data: [String: Any]) {
         dbRef.child("users").child(userId).setValue(data)
     }
     
+    // Updated to store comments inside posts
     func postComment(postId: String, userId: String, username: String, text: String, completion: @escaping (Bool, Error?) -> Void) {
-        let comment = Comment(postId: postId, userId: userId, username: username, text: text)
-        
-        // Store comment in Firebase under the post ID
-        let commentRef = self.dbRef.child("comments").child(postId).child(comment.id)
-        
-        commentRef.setValue([
+        let commentId = UUID().uuidString // Generate a unique ID for the comment
+        let commentData: [String: Any] = [
             "userId": userId,
             "username": username,
             "text": text,
-            "timestamp": comment.timestamp
-        ]) { error, _ in
+            "timestamp": Date().timeIntervalSince1970 // Store timestamp
+        ]
+        
+        // Store comment in Firebase under the post ID
+        let commentRef = self.dbRef.child("posts").child(postId).child("comments").child(commentId)
+        
+        commentRef.setValue(commentData) { error, _ in
             completion(error == nil, error)
         }
     }
+    
+    // Updated to fetch comments from the posts
     func fetchComments(for postId: String, completion: @escaping ([Comment], Error?) -> Void) {
-        dbRef.child("comments").child(postId).getData { error, snapshot in
+        dbRef.child("posts").child(postId).child("comments").getData { error, snapshot in
             // Initialize an empty array to store comments
             var comments: [Comment] = []
             
@@ -132,12 +135,4 @@ class FirebaseService: ObservableObject {
             completion(comments, nil)
         }
     }
-
-    
-  
-
-
-
-
-
 }

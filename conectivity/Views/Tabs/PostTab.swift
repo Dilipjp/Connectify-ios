@@ -1,9 +1,14 @@
 //
-//  PostTab.swift
+//  PostScreen.swift
 //  conectivity
 //
 //  Created by Dilip on 2024-09-29.
 //
+import SwiftUI
+import Firebase
+import FirebaseStorage
+import FirebaseAuth
+
 import SwiftUI
 import Firebase
 import FirebaseStorage
@@ -15,7 +20,8 @@ struct PostScreen: View {
     @State private var isImagePickerPresented = false
     @State private var isLoading = false
     @State private var successMessage: String? = nil
-    @State private var comments: [Comment] = []
+    @State private var comments: [Comment] = [] // State variable to hold comments
+    @State private var commentsLoading = false // To manage loading state for comments
     
     var postId: String
     var userId: String
@@ -68,7 +74,7 @@ struct PostScreen: View {
                 ImagePicker(image: $postImage)
             }
 
-            // Loading Indicator
+            // Loading Indicator for post creation
             if isLoading {
                 ProgressView("Creating post...")
                     .progressViewStyle(CircularProgressViewStyle())
@@ -86,28 +92,45 @@ struct PostScreen: View {
             Spacer()
             
             // Comments Section
-            if isLoading {
-                ProgressView()
+            if commentsLoading {
+                ProgressView("Loading comments...")
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .padding()
             } else {
-                List(comments) { comment in
-                    VStack(alignment: .leading) {
-                        Text(comment.username).fontWeight(.bold)
-                        Text(comment.text)
-                        Text("Just now") // Replace with proper timestamp formatting
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
+                List {
+                    ForEach(comments) { comment in
+                        VStack(alignment: .leading) {
+                            Text(comment.username).fontWeight(.bold)
+                            Text(comment.text)
+                            Text("Just now") // Replace with proper timestamp formatting
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                        }
                     }
                 }
             }
 
             // Comment Input
             CommentInputView(postId: postId, userId: userId, username: username) {
-                fetchComments() // Refresh comments after posting
+                // Reload comments or perform any needed action after posting
+                fetchComments() // Fetch comments again after a new comment is posted
             }
             .padding()
         }
         .onAppear {
-            fetchComments()
+            fetchComments() // Fetch comments when the view appears
+        }
+    }
+
+    private func fetchComments() {
+        commentsLoading = true
+        firebaseService.fetchComments(for: postId) { fetchedComments, error in
+            commentsLoading = false
+            if let error = error {
+                print("Error fetching comments: \(error.localizedDescription)")
+            } else {
+                comments = fetchedComments // Update comments state
+            }
         }
     }
 
@@ -118,72 +141,50 @@ struct PostScreen: View {
             return
         }
 
-        // Create a unique post ID
         let postId = UUID().uuidString
         let timestamp = Int(Date().timeIntervalSince1970)
 
         let storageRef = Storage.storage().reference().child("post_images/\(postId).jpg")
 
-        // Show loading indicator
-        isLoading = true
+        isLoading = true // Show loading indicator
 
         // Upload image to Firebase Storage
         storageRef.putData(imageData, metadata: nil) { _, error in
             if let error = error {
                 print("Error uploading image: \(error.localizedDescription)")
-                isLoading = false
+                isLoading = false // Hide loading indicator
                 return
             }
 
             // Get the download URL
             storageRef.downloadURL { url, error in
-                if let error = error {
-                    print("Error getting download URL: \(error.localizedDescription)")
-                    isLoading = false
+                guard let imageUrl = url?.absoluteString else {
+                    print("Error getting download URL: \(error?.localizedDescription ?? "Unknown error")")
+                    isLoading = false // Hide loading indicator
                     return
                 }
 
-                if let url = url {
-                    // Create post data
-                    let postData: [String: Any] = [
-                        "caption": caption,
-                        "postId": postId,
-                        "postImageUrl": url.absoluteString,
-                        "timestamp": timestamp,
-                        "userId": user.uid
-                    ]
+                // Create a post object
+                let postDict: [String: Any] = [
+                    "userId": user.uid,
+                    "postImageUrl": imageUrl,
+                    "caption": caption,
+                    "timestamp": timestamp
+                ]
 
-                    // Save post data to Realtime Database
-                    let dbRef = Database.database().reference().child("posts").child(postId)
-                    dbRef.setValue(postData) { error, _ in
-                        // Hide loading indicator
-                        isLoading = false
-
-                        if let error = error {
-                            print("Error saving post: \(error.localizedDescription)")
-                        } else {
-                            // Clear fields after posting
-                            caption = ""
-                            postImage = nil
-
-                            // Show success message
-                            successMessage = "Post created successfully!"
-                            // Remove success message after 2 seconds
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                successMessage = nil
-                            }
-                        }
+                // Save post to Firebase Realtime Database
+                let postRef = Database.database().reference().child("posts").child(postId)
+                postRef.setValue(postDict) { error, _ in
+                    isLoading = false // Hide loading indicator
+                    if let error = error {
+                        print("Error saving post: \(error.localizedDescription)")
+                    } else {
+                        self.successMessage = "Post created successfully!"
+                        self.caption = "" // Clear caption
+                        self.postImage = nil // Clear image
                     }
                 }
             }
-        }
-    }
-
-    private func fetchComments() {
-        isLoading = true
-        firebaseService.fetchComments(for: postId) { comments, error in
-            self.comments = comments
-            self.isLoading = false
         }
     }
 }
