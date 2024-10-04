@@ -60,6 +60,7 @@ struct HomeScreen: View {
                             .padding(.vertical, 5)
                             HStack{
                                 
+                              //  share
                                 Button(action: {
                                     sharePost(imageUrl: post.postImageUrl, caption: post.caption)
                                         }) {
@@ -135,8 +136,9 @@ struct HomeScreen: View {
         let textToShare = caption + "\n" + imageUrl
            let activityVC = UIActivityViewController(activityItems: [textToShare], applicationActivities: nil)
 
-           // Present the share sheet
-           
+        if let topController = UIApplication.shared.windows.first?.rootViewController {
+            topController.present(activityVC, animated: true, completion: nil)
+        }
        }
 }
 
