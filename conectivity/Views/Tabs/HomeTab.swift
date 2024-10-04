@@ -136,9 +136,7 @@ struct HomeScreen: View {
            let activityVC = UIActivityViewController(activityItems: [textToShare], applicationActivities: nil)
 
            // Present the share sheet
-           if let topController = UIApplication.shared.windows.first?.rootViewController {
-               topController.present(activityVC, animated: true, completion: nil)
-           }
+           
        }
 }
 
