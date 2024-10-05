@@ -34,4 +34,16 @@ struct Comment: Identifiable {
         self.text = text
         self.timestamp = timestamp // Set the timestamp from fetched data
     }
+    
+    static func fromSnapshot(snapshot: [String: Any]) -> Comment? {
+           guard let userId = snapshot["userId"] as? String,
+                 let username = snapshot["username"] as? String,
+                 let text = snapshot["text"] as? String,
+                 let timestamp = snapshot["timestamp"] as? TimeInterval else {
+               return nil
+           }
+           let commentId = snapshot["commentId"] as? String ?? UUID().uuidString
+           return Comment(id: commentId, postId: "", userId: userId, username: username, text: text, timestamp: timestamp)
+       }
+   
 }

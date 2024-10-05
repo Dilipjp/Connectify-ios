@@ -1,14 +1,3 @@
-//
-//  PostScreen.swift
-//  conectivity
-//
-//  Created by Dilip on 2024-09-29.
-//
-import SwiftUI
-import Firebase
-import FirebaseStorage
-import FirebaseAuth
-
 import SwiftUI
 import Firebase
 import FirebaseStorage
@@ -20,8 +9,6 @@ struct PostScreen: View {
     @State private var isImagePickerPresented = false
     @State private var isLoading = false
     @State private var successMessage: String? = nil
-    @State private var comments: [Comment] = [] // State variable to hold comments
-    @State private var commentsLoading = false // To manage loading state for comments
     
     var postId: String
     var userId: String
@@ -90,47 +77,6 @@ struct PostScreen: View {
             }
 
             Spacer()
-            
-            // Comments Section
-            if commentsLoading {
-                ProgressView("Loading comments...")
-                    .progressViewStyle(CircularProgressViewStyle())
-                    .padding()
-            } else {
-                List {
-                    ForEach(comments) { comment in
-                        VStack(alignment: .leading) {
-                            Text(comment.username).fontWeight(.bold)
-                            Text(comment.text)
-                            Text("Just now") // Replace with proper timestamp formatting
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
-                        }
-                    }
-                }
-            }
-
-            // Comment Input
-            CommentInputView(postId: postId, userId: userId, username: username) {
-                // Reload comments or perform any needed action after posting
-                fetchComments() // Fetch comments again after a new comment is posted
-            }
-            .padding()
-        }
-        .onAppear {
-            fetchComments() // Fetch comments when the view appears
-        }
-    }
-
-    private func fetchComments() {
-        commentsLoading = true
-        firebaseService.fetchComments(for: postId) { fetchedComments, error in
-            commentsLoading = false
-            if let error = error {
-                print("Error fetching comments: \(error.localizedDescription)")
-            } else {
-                comments = fetchedComments // Update comments state
-            }
         }
     }
 

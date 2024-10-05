@@ -1,5 +1,5 @@
 //
-//  CommentView.swift
+//  CommentInputView.swift
 //  conectivity
 //
 //  Created by Santhosh Nallapati on 2024-10-02.
@@ -26,15 +26,16 @@ struct CommentInputView: View {
                 Text("Post")
                     .foregroundColor(.blue)
             }
-            .disabled(commentText.isEmpty)
+            .disabled(commentText.isEmpty) // Disable button if no text is entered
         }
+        .padding(.horizontal)
     }
 
     private func postComment() {
         firebaseService.postComment(postId: postId, userId: userId, username: username, text: commentText) { success, error in
             if success {
-                commentText = ""
-                onCommentPosted() // Notify the parent view to refresh comments
+                commentText = "" // Clear text field on success
+                onCommentPosted() // Notify parent view to refresh comments
             } else {
                 print("Error posting comment: \(error?.localizedDescription ?? "Unknown error")")
             }

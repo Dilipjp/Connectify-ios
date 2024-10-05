@@ -1,15 +1,18 @@
 //
-//  HomeScreen.swift
+//  HomeTab.swift
 //  conectivity
 //
 //  Created by Dilip on 2024-09-29.
 //
+
 import SwiftUI
 import Firebase
 import FirebaseDatabase
+import FirebaseAuth
 
 struct HomeScreen: View {
     @State private var posts: [Post] = []
+    @State private var newComments: [String: String] = [:] // Store new comments for each post
     
     // Reference to the Firebase Realtime Database
     private var dbRef = Database.database().reference()
@@ -36,7 +39,7 @@ struct HomeScreen: View {
                                     Text(userData.userName)
                                         .font(.headline)
                                         .padding(.leading, 8)
-
+                                    
                                     Spacer()
                                 }
                                 .padding(.horizontal, 10)
@@ -60,20 +63,30 @@ struct HomeScreen: View {
                             Text(post.caption)
                                 .padding(.horizontal, 10)
                                 .padding(.bottom, 10)
-
+                            
                             // Comments Section
-                            ForEach(post.comments) { comment in
-                                VStack(alignment: .leading) {
-                                    Text(comment.username).fontWeight(.bold)
-                                    Text(comment.text)
-                                        .font(.subheadline)
-                                    Text("Just now") // You might want to format the timestamp
-                                        .font(.caption)
-                                        .foregroundColor(.gray)
+                            if post.comments.isEmpty {
+                                Text("No comments yet.")
+                                    .padding(.horizontal, 10)
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                            } else {
+                                ForEach(post.comments) { comment in
+                                    VStack(alignment: .leading) {
+                                        Text(comment.username).fontWeight(.bold)
+                                        Text(comment.text)
+                                            .font(.subheadline)
+                                        Text("Just now") // You might want to format the timestamp
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+                                    }
+                                    .padding(.horizontal, 10)
+                                    .padding(.bottom, 5)
                                 }
-                                .padding(.horizontal, 10)
-                                .padding(.bottom, 5)
                             }
+
+                            // Comment Input Section
+                            commentInput(for: post)
                         }
                         .background(Color.white)
                         .cornerRadius(10)
@@ -89,40 +102,110 @@ struct HomeScreen: View {
         }
     }
 
+    // Separate view for comment input
+    private func commentInput(for post: Post) -> some View {
+        HStack {
+            TextField("Add a comment...", text: Binding(
+                get: { newComments[post.id, default: ""] },
+                set: { newComments[post.id] = $0 }
+            ))
+            .textFieldStyle(RoundedBorderTextFieldStyle())
+
+            Button(action: {
+                addComment(for: post)
+            }) {
+                Text("Post")
+                    .foregroundColor(.blue)
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.bottom, 10)
+    }
+
     // Fetch posts from Firebase Realtime Database
     func fetchPosts() {
-        dbRef.child("posts").observeSingleEvent(of: .value) { snapshot in
+        dbRef.child("posts").observe(.value) { (snapshot: DataSnapshot) in
             var newPosts: [Post] = []
-            for child in snapshot.children {
-                if let snapshot = child as? DataSnapshot,
-                   let dict = snapshot.value as? [String: Any],
-                   let postId = snapshot.key as? String,
-                   let userId = dict["userId"] as? String,
-                   let postImageUrl = dict["postImageUrl"] as? String,
-                   let caption = dict["caption"] as? String {
-                    
-                    var comments: [Comment] = []
 
-                    // Fetch comments from the nested structure
-                    if let commentsDict = dict["comments"] as? [String: Any] {
-                        for (commentId, commentData) in commentsDict {
-                            if let commentDict = commentData as? [String: Any],
-                               let userId = commentDict["userId"] as? String,
-                               let username = commentDict["username"] as? String,
-                               let text = commentDict["text"] as? String,
-                               let timestamp = commentDict["timestamp"] as? TimeInterval {
-                                let comment = Comment(id: commentId, postId: postId, userId: userId, username: username, text: text, timestamp: timestamp)
-                                comments.append(comment)
-                            }
-                        }
+            // Ensure that snapshot is a valid DataSnapshot
+            if let dict = snapshot.value as? [String: Any] {
+                for (key, value) in dict {
+                    if let postDict = value as? [String: Any],
+                       let userId = postDict["userId"] as? String,
+                       let postImageUrl = postDict["postImageUrl"] as? String,
+                       let caption = postDict["caption"] as? String {
+                        let postId = key // Use key as postId
+                        let post = Post(id: postId, userId: userId, postImageUrl: postImageUrl, caption: caption)
+                        newPosts.append(post)
                     }
-
-                    let post = Post(postId: postId, userId: userId, postImageUrl: postImageUrl, caption: caption, comments: comments)
-                    newPosts.append(post)
                 }
             }
+
             self.posts = newPosts
             fetchUserDetails(for: newPosts)
+
+            // After fetching posts, fetch comments for each post
+            for post in newPosts {
+                fetchComments(for: post.id) { comments in
+                    if let index = newPosts.firstIndex(where: { $0.id == post.id }) {
+                        newPosts[index].comments = comments // Update the comments for the post
+                    }
+                }
+            }
+        }
+    }
+
+    // Add comment to Firebase
+    func addComment(for post: Post) {
+        guard let user = Auth.auth().currentUser else { return }
+
+        let commentId = UUID().uuidString
+        let timestamp = Int(Date().timeIntervalSince1970)
+        let commentText = newComments[post.id, default: ""]
+
+        let commentDict: [String: Any] = [
+            "userId": user.uid,
+            "username": user.displayName ?? "Anonymous",
+            "text": commentText,
+            "timestamp": timestamp
+        ]
+
+        dbRef.child("comments").child(post.id).child(commentId).setValue(commentDict) { error, _ in
+            if let error = error {
+                print("Error adding comment: \(error.localizedDescription)")
+                return
+            }
+
+            // Clear the comment input after posting
+            newComments[post.id] = ""
+            fetchComments(for: post.id) { comments in
+                if let index = posts.firstIndex(where: { $0.id == post.id }) {
+                    posts[index].comments = comments
+                }
+            }
+        }
+    }
+    
+    // Fetch comments for a specific post
+    func fetchComments(for postId: String, completion: @escaping ([Comment]) -> Void) {
+        dbRef.child("comments").child(postId).observeSingleEvent(of: .value) { snapshot in
+            var comments: [Comment] = []
+            
+            // Check if the snapshot is valid
+            if let dict = snapshot.value as? [String: Any] {
+                for (key, value) in dict {
+                    if let commentDict = value as? [String: Any],
+                       let userId = commentDict["userId"] as? String,
+                       let username = commentDict["username"] as? String,
+                       let text = commentDict["text"] as? String,
+                       let timestamp = commentDict["timestamp"] as? TimeInterval {
+                        let comment = Comment(id: key, postId: postId, userId: userId, username: username, text: text, timestamp: timestamp)
+                        comments.append(comment)
+                    }
+                }
+            }
+            
+            completion(comments) // Pass the comments back to the caller
         }
     }
 
@@ -151,6 +234,8 @@ struct HomeScreen: View {
                                     self.posts[index].userData = UserData(userName: userName, profileImage: image)
                                 }
                             }
+                        } else {
+                            print("Error loading image: \(error?.localizedDescription ?? "Unknown error")")
                         }
                     }.resume()
                 }
