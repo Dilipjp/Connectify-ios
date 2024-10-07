@@ -133,9 +133,10 @@ struct HomeScreen: View {
                     if let postDict = value as? [String: Any],
                        let userId = postDict["userId"] as? String,
                        let postImageUrl = postDict["postImageUrl"] as? String,
-                       let caption = postDict["caption"] as? String {
+                       let caption = postDict["caption"] as? String,
+                       let timestamp = postDict["timestamp"] as? Int { // Fetch the timestamp
                         let postId = key // Use key as postId
-                        let post = Post(id: postId, userId: userId, postImageUrl: postImageUrl, caption: caption)
+                        let post = Post(id: postId, userId: userId, postImageUrl: postImageUrl, caption: caption, timestamp: timestamp) // Include timestamp
                         newPosts.append(post)
                     }
                 }
