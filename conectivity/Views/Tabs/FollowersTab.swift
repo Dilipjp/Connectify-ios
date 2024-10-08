@@ -15,7 +15,7 @@ struct FollowersScreen: View {  // Rename to FollowersScreen
     }
 }
 
-struct FollowersScreen_Previews: PreviewProvider {
+struct FollowersScreenPreview: PreviewProvider {
     static var previews: some View {
         FollowersScreen()
     }

@@ -18,13 +18,15 @@ struct HomeScreen: View {
                             if let userData = posts[index].userData {
                                 HStack(alignment: .center) {
                                     // Profile Image
-                                    Image(uiImage: userData.profileImage)
-                                        .resizable()
-                                        .scaledToFill()  // Ensures the image fills the frame and is cropped
-                                        .frame(width: 40, height: 40)  // Ensure square frame
-                                        .clipShape(Circle())  // Clips the image into a perfect circle
-                                        .overlay(Circle().stroke(Color.gray, lineWidth: 1))  // Optional: Add a border to the circle
-                                        .padding(5) // Round profile image
+                                    NavigationLink(destination: UserProfileView(userId: posts[index].userId)) { // Navigate to user profile
+                                        Image(uiImage: userData.profileImage)
+                                            .resizable()
+                                            .scaledToFill()  // Ensures the image fills the frame and is cropped
+                                            .frame(width: 40, height: 40)  // Ensure square frame
+                                            .clipShape(Circle())  // Clips the image into a perfect circle
+                                            .overlay(Circle().stroke(Color.gray, lineWidth: 1))  // Optional: Add a border to the circle
+                                            .padding(5) // Round profile image
+                                    }
 
                                     // Username
                                     Text(userData.userName)
