@@ -14,6 +14,9 @@ struct ProfileScreen: View {
     @State private var profileImage: UIImage? = nil
     @State private var username: String = ""
     @State private var userBio: String = ""
+    @State private var postCount: Int = 0
+    @State private var followersCount: Int = 0
+    @State private var followingCount: Int = 0
     @State private var isImagePickerPresented = false
     @State private var isEditing = false
     @State private var isLoading = false
@@ -33,7 +36,7 @@ struct ProfileScreen: View {
                         .scaledToFit()
                         .frame(width: 150, height: 150)
                         .clipShape(Circle())
-                        .overlay(Circle().stroke(Color.blue, lineWidth: 4))
+                        .overlay(Circle().stroke(Color.black, lineWidth: 4))
                         .shadow(radius: 10)
                         .padding()
                         .onTapGesture {
@@ -61,7 +64,30 @@ struct ProfileScreen: View {
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
-
+                // Post, Followers, and Following counts in a row
+                HStack(spacing: 30) {
+                                    VStack {
+                                        Text("\(postCount)")
+                                            .font(.headline)
+                                        Text("Posts")
+                                            .font(.subheadline)
+                                            .foregroundColor(.gray)
+                                    }
+                                    VStack {
+                                        Text("\(followersCount)")
+                                            .font(.headline)
+                                        Text("Followers")
+                                            .font(.subheadline)
+                                            .foregroundColor(.gray)
+                                    }
+                                    VStack {
+                                        Text("\(followingCount)")
+                                            .font(.headline)
+                                        Text("Following")
+                                            .font(.subheadline)
+                                            .foregroundColor(.gray)
+                                    }
+                                }
                 // Edit Profile Button
                 Button(action: {
                     isEditing.toggle() // This will trigger the sheet to show
@@ -70,7 +96,7 @@ struct ProfileScreen: View {
                         .font(.headline)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Color.blue)
+                        .background(Color.black)
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
@@ -90,7 +116,7 @@ struct ProfileScreen: View {
                 // Success message
                 if let successMessage = successMessage {
                     Text(successMessage)
-                        .foregroundColor(.green)
+                        .foregroundColor(.black)
                         .fontWeight(.bold)
                 }
 
@@ -100,7 +126,7 @@ struct ProfileScreen: View {
                         .font(.headline)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Color.red)
+                        .background(Color.black)
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }

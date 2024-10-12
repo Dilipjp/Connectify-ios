@@ -64,7 +64,7 @@ struct PostScreen: View {
                     .font(.headline)
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(Color.blue)
+                    .background(Color.black)
                     .foregroundColor(.white)
                     .cornerRadius(10)
             }
