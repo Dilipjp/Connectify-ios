@@ -63,7 +63,7 @@ struct PostScreen: View {
 
             // Loading Indicator for post creation
             if isLoading {
-                ProgressView("Creating post...")
+                ProgressView("Creating post.......")
                     .progressViewStyle(CircularProgressViewStyle())
                     .padding()
             }
