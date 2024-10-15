@@ -1,10 +1,3 @@
-//
-//  HomeView.swift
-//  conectivity
-//
-//  Created by Dilip on 2024-09-29.
-//
-
 import SwiftUI
 
 struct HomeView: View {
@@ -38,6 +31,3 @@ struct HomeView_Previews: PreviewProvider {
         HomeView()
     }
 }
-
-
-
