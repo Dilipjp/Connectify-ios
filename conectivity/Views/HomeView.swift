@@ -1,28 +1,24 @@
 import SwiftUI
-import FirebaseAuth
 
 struct HomeView: View {
-    @EnvironmentObject var firebaseService: FirebaseService
-    @State private var currentUserId: String = Auth.auth().currentUser?.uid ?? ""
-
     var body: some View {
         TabView {
-            HomeScreen()
+            HomeScreen()  // Use the renamed HomeScreen
                 .tabItem {
                     Label("Home", systemImage: "house.fill")
                 }
 
-            FollowersView(currentUserId: currentUserId) // Update to FollowersView
+            FollowersScreen()  // Use the renamed FollowersScreen
                 .tabItem {
                     Label("Followers", systemImage: "person.2.fill")
                 }
 
-            PostScreen()
+            PostScreen()  // Use the renamed PostScreen
                 .tabItem {
                     Label("Post", systemImage: "plus.circle.fill")
                 }
 
-            ProfileScreen()
+            ProfileScreen()  // Use the renamed ProfileScreen
                 .tabItem {
                     Label("Profile", systemImage: "person.crop.circle.fill")
                 }
@@ -32,6 +28,6 @@ struct HomeView: View {
 
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
-        HomeView().environmentObject(FirebaseService())
+        HomeView()
     }
 }
