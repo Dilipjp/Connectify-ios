@@ -1,4 +1,4 @@
-//
+
 //  HomeTab.swift
 //  conectivity
 //
@@ -11,8 +11,10 @@ import FirebaseAuth
 
 struct HomeScreen: View {
     @State private var posts: [Post] = []
+    @State private var loadingUsers: [Bool] = []
+    @State private var showShareSheet = false
+    @State private var shareContent: String = ""
 
-    // Reference to the Firebase Realtime Database
     private var dbRef = Database.database().reference()
 
     var body: some View {
@@ -37,6 +39,22 @@ struct HomeScreen: View {
                                     Text(userData.userName)
                                         .font(.headline)
                                         .padding(.leading, 8)
+
+                                    Spacer()
+                                }
+                                .padding(.horizontal, 10)
+                                .padding(.top, 5)
+                            } else if loadingUsers[index] {
+                                // Placeholder while loading
+                                HStack(alignment: .center) {
+                                    Circle()
+                                        .fill(Color.gray.opacity(0.5))
+                                        .frame(width: 40, height: 40)
+                                        .padding(5)
+
+                                    Rectangle()
+                                        .fill(Color.gray.opacity(0.5))
+                                        .frame(width: 100, height: 20)
 
                                     Spacer()
                                 }
@@ -96,6 +114,8 @@ struct HomeScreen: View {
                                 
                                 Button(action: {
                                     // Share action
+                                    shareContent = posts[index].caption // or any other content you want to share
+                                    showShareSheet = true // Show the share sheet
                                 }) {
                                     Image(systemName: "paperplane")
                                         .resizable()
@@ -121,9 +141,26 @@ struct HomeScreen: View {
                 .padding(.horizontal)
             }
             .navigationTitle("Connectify")
+            .sheet(isPresented: $showShareSheet) {
+                            ShareSheet(activityItems: [shareContent])
+                        }
         }
         .onAppear {
             fetchPosts()  // Fetch posts when the view appears
+        }
+    }
+    
+    // ShareSheet struct to present the share sheet
+    struct ShareSheet: UIViewControllerRepresentable {
+        var activityItems: [Any]
+
+        func makeUIViewController(context: Context) -> UIActivityViewController {
+            let shareSheet = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+            return shareSheet
+        }
+
+        func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {
+            // No updates needed
         }
     }
 
@@ -161,11 +198,13 @@ struct HomeScreen: View {
             // Sort posts by timestamp in descending order (latest first)
             self.posts = newPosts.sorted(by: { $0.timestamp > $1.timestamp })
 
+            // Initialize loadingUsers array
+            self.loadingUsers = Array(repeating: true, count: self.posts.count)
+
             // Fetch user details for the posts
             fetchUserDetails(for: self.posts)
         }
     }
-
 
     // Fetch user details for each post from Firebase
     func fetchUserDetails(for posts: [Post]) {
@@ -182,6 +221,7 @@ struct HomeScreen: View {
                             DispatchQueue.main.async {
                                 // Update the specific post with user data
                                 self.posts[index].userData = UserData(userName: userName, profileImage: image)
+                                self.loadingUsers[index] = false // Set loading to false once data is fetched
                             }
                         }
                     }.resume()
@@ -190,6 +230,7 @@ struct HomeScreen: View {
         }
     }
     
+   
     func toggleLike(for post: Post, at index: Int) {
         guard let currentUserId = Auth.auth().currentUser?.uid else { return }
 
@@ -198,11 +239,14 @@ struct HomeScreen: View {
         // Disable the like button to prevent multiple taps
         self.posts[index].isLikeButtonDisabled = true
 
-        // Optimistically update the UI for instant feedback
+        // Optimistically update the like count and liked state
         var updatedPost = self.posts[index]
         updatedPost.likedByCurrentUser.toggle()  // Toggle like/unlike state
         updatedPost.likeCount += updatedPost.likedByCurrentUser ? 1 : -1  // Update like count
-        self.posts[index] = updatedPost  // SwiftUI will automatically refresh the UI
+
+        // Update only the like-related data without affecting the user profile image or username
+        self.posts[index].likeCount = updatedPost.likeCount
+        self.posts[index].likedByCurrentUser = updatedPost.likedByCurrentUser
 
         // Perform Firebase transaction
         postRef.runTransactionBlock({ (currentData) -> TransactionResult in
@@ -239,18 +283,15 @@ struct HomeScreen: View {
                     var revertedPost = self.posts[index]
                     revertedPost.likedByCurrentUser.toggle()  // Revert like/unlike state
                     revertedPost.likeCount += revertedPost.likedByCurrentUser ? 1 : -1  // Revert like count
-                    self.posts[index] = revertedPost
+                    self.posts[index].likeCount = revertedPost.likeCount
+                    self.posts[index].likedByCurrentUser = revertedPost.likedByCurrentUser
                 }
             }
         }
-    
-
     }
 
-
-
-
 }
+
 
 // Post model
 
@@ -274,11 +315,3 @@ struct UserData {
     let userName: String
     let profileImage: UIImage
 }
-
-
-
-
-
-
-
-

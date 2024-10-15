@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2A9498792CB5E3BE004A8AC4 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2A9498782CB5E3BE004A8AC4 /* GoogleService-Info.plist */; };
+		5FDB3B1B2CAFA14300D918AB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5FDB3B1A2CAFA14200D918AB /* GoogleService-Info.plist */; };
 		DA7ED55F2CA9EAAE008C91D8 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = DA7ED55E2CA9EAAE008C91D8 /* FirebaseAuth */; };
 		DA7ED5612CA9EAAE008C91D8 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = DA7ED5602CA9EAAE008C91D8 /* FirebaseDatabase */; };
 		DA7ED5632CA9EAAE008C91D8 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = DA7ED5622CA9EAAE008C91D8 /* FirebaseStorage */; };
@@ -51,8 +51,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		2A9498782CB5E3BE004A8AC4 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		2A94987A2CB5E553004A8AC4 /* conectivity.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = conectivity.xcodeproj; sourceTree = SOURCE_ROOT; };
+		5FDB3B1A2CAFA14200D918AB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		DA7ED5772CA9F96E008C91D8 /* FirebaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseService.swift; sourceTree = "<group>"; };
 		DA7ED5792CA9F9D4008C91D8 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		DA7ED57B2CA9F9FF008C91D8 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
@@ -107,11 +106,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		2A94987D2CB5E5CB004A8AC4 /* Products */ = {
-			isa = PBXGroup;
-			name = Products;
-			sourceTree = "<group>";
-		};
 		DA7ED5662CA9F281008C91D8 /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -156,12 +150,11 @@
 		DAC7C6F92C995A640032853B = {
 			isa = PBXGroup;
 			children = (
+				5FDB3B1A2CAFA14200D918AB /* GoogleService-Info.plist */,
 				DAC7C7042C995A640032853B /* conectivity */,
 				DAC7C7162C995A660032853B /* conectivityTests */,
 				DAC7C7202C995A660032853B /* conectivityUITests */,
 				DAC7C7032C995A640032853B /* Products */,
-				2A94987A2CB5E553004A8AC4 /* conectivity.xcodeproj */,
-				2A9498782CB5E3BE004A8AC4 /* GoogleService-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -285,7 +278,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1540;
-				LastUpgradeCheck = 1600;
+				LastUpgradeCheck = 1540;
 				TargetAttributes = {
 					DAC7C7012C995A640032853B = {
 						CreatedOnToolsVersion = 15.4;
@@ -314,12 +307,6 @@
 			);
 			productRefGroup = DAC7C7032C995A640032853B /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 2A94987D2CB5E5CB004A8AC4 /* Products */;
-					ProjectRef = 2A94987A2CB5E553004A8AC4 /* conectivity.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				DAC7C7012C995A640032853B /* conectivity */,
@@ -335,8 +322,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				DAC7C70E2C995A660032853B /* Preview Assets.xcassets in Resources */,
-				2A9498792CB5E3BE004A8AC4 /* GoogleService-Info.plist in Resources */,
 				DAC7C70A2C995A650032853B /* Assets.xcassets in Resources */,
+				5FDB3B1B2CAFA14300D918AB /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -445,7 +432,6 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -507,7 +493,6 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -535,7 +520,6 @@
 				CODE_SIGN_ENTITLEMENTS = conectivity/conectivity.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"conectivity/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -572,7 +556,6 @@
 				CODE_SIGN_ENTITLEMENTS = conectivity/conectivity.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"conectivity/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -604,10 +587,10 @@
 		DAC7C72B2C995A660032853B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
 				MACOSX_DEPLOYMENT_TARGET = 14.5;
@@ -626,10 +609,10 @@
 		DAC7C72C2C995A660032853B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
 				MACOSX_DEPLOYMENT_TARGET = 14.5;
@@ -648,9 +631,9 @@
 		DAC7C72E2C995A660032853B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
 				MACOSX_DEPLOYMENT_TARGET = 14.5;
@@ -669,9 +652,9 @@
 		DAC7C72F2C995A660032853B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
 				MACOSX_DEPLOYMENT_TARGET = 14.5;
