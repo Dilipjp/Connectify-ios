@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5FDB3B1B2CAFA14300D918AB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5FDB3B1A2CAFA14200D918AB /* GoogleService-Info.plist */; };
+		555BA0BF2CAC6DA500E1F62E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 555BA0BE2CAC6DA500E1F62E /* GoogleService-Info.plist */; };
 		DA7ED55F2CA9EAAE008C91D8 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = DA7ED55E2CA9EAAE008C91D8 /* FirebaseAuth */; };
 		DA7ED5612CA9EAAE008C91D8 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = DA7ED5602CA9EAAE008C91D8 /* FirebaseDatabase */; };
 		DA7ED5632CA9EAAE008C91D8 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = DA7ED5622CA9EAAE008C91D8 /* FirebaseStorage */; };
@@ -51,7 +51,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		5FDB3B1A2CAFA14200D918AB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		555BA0BE2CAC6DA500E1F62E /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		DA7ED5772CA9F96E008C91D8 /* FirebaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseService.swift; sourceTree = "<group>"; };
 		DA7ED5792CA9F9D4008C91D8 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		DA7ED57B2CA9F9FF008C91D8 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
@@ -150,11 +150,11 @@
 		DAC7C6F92C995A640032853B = {
 			isa = PBXGroup;
 			children = (
-				5FDB3B1A2CAFA14200D918AB /* GoogleService-Info.plist */,
 				DAC7C7042C995A640032853B /* conectivity */,
 				DAC7C7162C995A660032853B /* conectivityTests */,
 				DAC7C7202C995A660032853B /* conectivityUITests */,
 				DAC7C7032C995A640032853B /* Products */,
+				555BA0BE2CAC6DA500E1F62E /* GoogleService-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -323,7 +323,7 @@
 			files = (
 				DAC7C70E2C995A660032853B /* Preview Assets.xcassets in Resources */,
 				DAC7C70A2C995A650032853B /* Assets.xcassets in Resources */,
-				5FDB3B1B2CAFA14300D918AB /* GoogleService-Info.plist in Resources */,
+				555BA0BF2CAC6DA500E1F62E /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

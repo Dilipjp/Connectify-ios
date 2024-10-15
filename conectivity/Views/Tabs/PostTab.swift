@@ -9,6 +9,12 @@ struct PostScreen: View {
     @State private var isImagePickerPresented = false
     @State private var isLoading = false
     @State private var successMessage: String? = nil
+    
+    var postId: String
+    var userId: String
+    var username: String
+
+    @EnvironmentObject var firebaseService: FirebaseService
 
     var body: some View {
         VStack(spacing: 20) {
@@ -55,9 +61,9 @@ struct PostScreen: View {
                 ImagePicker(image: $postImage)
             }
 
-            // Loading Indicator
+            // Loading Indicator for post creation
             if isLoading {
-                ProgressView("Creating post...")
+                ProgressView("Creating post.......")
                     .progressViewStyle(CircularProgressViewStyle())
                     .padding()
             }
@@ -72,71 +78,56 @@ struct PostScreen: View {
 
             Spacer()
         }
-        .padding()
     }
 
-    func savePost() {
+    private func savePost() {
         guard let user = Auth.auth().currentUser,
               let image = postImage,
               let imageData = image.jpegData(compressionQuality: 0.8) else {
             return
         }
 
-        // Create a unique post ID
         let postId = UUID().uuidString
         let timestamp = Int(Date().timeIntervalSince1970)
 
         let storageRef = Storage.storage().reference().child("post_images/\(postId).jpg")
 
-        // Show loading indicator
-        isLoading = true
+        isLoading = true // Show loading indicator
 
         // Upload image to Firebase Storage
         storageRef.putData(imageData, metadata: nil) { _, error in
             if let error = error {
                 print("Error uploading image: \(error.localizedDescription)")
-                isLoading = false
+                isLoading = false // Hide loading indicator
                 return
             }
 
             // Get the download URL
             storageRef.downloadURL { url, error in
-                if let error = error {
-                    print("Error getting download URL: \(error.localizedDescription)")
-                    isLoading = false
+                guard let imageUrl = url?.absoluteString else {
+                    print("Error getting download URL: \(error?.localizedDescription ?? "Unknown error")")
+                    isLoading = false // Hide loading indicator
                     return
                 }
 
-                if let url = url {
-                    // Create post data
-                    let postData: [String: Any] = [
-                        "caption": caption,
-                        "postId": postId,
-                        "postImageUrl": url.absoluteString,
-                        "timestamp": timestamp,
-                        "userId": user.uid
-                    ]
+                // Create a post object
+                let postDict: [String: Any] = [
+                    "userId": user.uid,
+                    "postImageUrl": imageUrl,
+                    "caption": caption,
+                    "timestamp": timestamp
+                ]
 
-                    // Save post data to Realtime Database
-                    let dbRef = Database.database().reference().child("posts").child(postId)
-                    dbRef.setValue(postData) { error, _ in
-                        // Hide loading indicator
-                        isLoading = false
-
-                        if let error = error {
-                            print("Error saving post: \(error.localizedDescription)")
-                        } else {
-                            // Clear fields after posting
-                            caption = ""
-                            postImage = nil
-
-                            // Show success message
-                            successMessage = "Post created successfully!"
-                            // Remove success message after 2 seconds
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                successMessage = nil
-                            }
-                        }
+                // Save post to Firebase Realtime Database
+                let postRef = Database.database().reference().child("posts").child(postId)
+                postRef.setValue(postDict) { error, _ in
+                    isLoading = false // Hide loading indicator
+                    if let error = error {
+                        print("Error saving post: \(error.localizedDescription)")
+                    } else {
+                        self.successMessage = "Post created successfully!"
+                        self.caption = "" // Clear caption
+                        self.postImage = nil // Clear image
                     }
                 }
             }

@@ -13,7 +13,7 @@ struct HomeView: View {
                     Label("Followers", systemImage: "person.2.fill")
                 }
 
-            PostScreen()  // Use the renamed PostScreen
+            PostScreen(postId: "samplePostId", userId: "sampleUserId", username: "sampleUsername")  // Pass actual data
                 .tabItem {
                     Label("Post", systemImage: "plus.circle.fill")
                 }

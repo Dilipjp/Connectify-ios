@@ -1,9 +1,10 @@
-
+//
 //  HomeTab.swift
 //  conectivity
 //
 //  Created by Dilip on 2024-09-29.
 //
+
 import SwiftUI
 import Firebase
 import FirebaseDatabase
@@ -14,6 +15,9 @@ struct HomeScreen: View {
     @State private var loadingUsers: [Bool] = []
     @State private var showShareSheet = false
     @State private var shareContent: String = ""
+    @State private var showCommentSheet: Bool = false
+    @State private var selectedPost: Post?
+    @State private var newComment: String = ""
 
     private var dbRef = Database.database().reference()
 
@@ -23,19 +27,17 @@ struct HomeScreen: View {
                 VStack(spacing: 20) {
                     ForEach(posts.indices, id: \.self) { index in
                         VStack(alignment: .leading, spacing: 10) {
-                            // User Profile Image and Name in a Horizontal Stack (HStack)
+                            // User Profile Image and Name
                             if let userData = posts[index].userData {
-                                HStack(alignment: .center) {
-                                    // Profile Image
+                                HStack {
                                     Image(uiImage: userData.profileImage)
                                         .resizable()
                                         .scaledToFill()
                                         .frame(width: 40, height: 40)
                                         .clipShape(Circle())
-                                        .overlay(Circle().stroke(Color.gray, lineWidth: 1))  // Optional: Add a border to the circle
+                                        .overlay(Circle().stroke(Color.gray, lineWidth: 1))
                                         .padding(5)
 
-                                    // Username
                                     Text(userData.userName)
                                         .font(.headline)
                                         .padding(.leading, 8)
@@ -45,8 +47,7 @@ struct HomeScreen: View {
                                 .padding(.horizontal, 10)
                                 .padding(.top, 5)
                             } else if loadingUsers[index] {
-                                // Placeholder while loading
-                                HStack(alignment: .center) {
+                                HStack {
                                     Circle()
                                         .fill(Color.gray.opacity(0.5))
                                         .frame(width: 40, height: 40)
@@ -78,32 +79,31 @@ struct HomeScreen: View {
                             // Like, Comment, Share Icons with Count
                             HStack {
                                 Button(action: {
-                                        toggleLike(for: posts[index], at: index)
-                                    }) {
-                                        HStack {
-                                            Image(systemName: posts[index].likedByCurrentUser ? "heart.fill" : "heart")
-                                                .resizable()
-                                                .frame(width: 24, height: 24)
-                                                .foregroundColor(posts[index].likedByCurrentUser ? .red : .gray)
-
-                                            Text("\(posts[index].likeCount)")
-                                                .font(.subheadline)
-                                                .padding(.leading, 4)
-                                                .foregroundColor(.black)
-                                        }
+                                    toggleLike(for: posts[index], at: index)
+                                }) {
+                                    HStack {
+                                        Image(systemName: posts[index].likedByCurrentUser ? "heart.fill" : "heart")
+                                            .resizable()
+                                            .frame(width: 24, height: 24)
+                                            .foregroundColor(posts[index].likedByCurrentUser ? .red : .gray)
+                                        Text("\(posts[index].likeCount)")
+                                            .font(.subheadline)
+                                            .padding(.leading, 4)
+                                            .foregroundColor(.black)
                                     }
-                                    .disabled(posts[index].isLikeButtonDisabled)
+                                }
+                                .disabled(posts[index].isLikeButtonDisabled)
                                 .padding(.leading, 10)
 
                                 Button(action: {
-                                    // Comment action
+                                    selectedPost = posts[index]
+                                    showCommentSheet = true
                                 }) {
                                     HStack {
                                         Image(systemName: "message")
                                             .resizable()
                                             .frame(width: 24, height: 24)
                                             .foregroundColor(.black)
-                                        // Comment Count
                                         Text("\(posts[index].commentCount)")
                                             .font(.subheadline)
                                             .padding(.leading, 4)
@@ -111,11 +111,10 @@ struct HomeScreen: View {
                                     }
                                 }
                                 .padding(.leading, 10)
-                                
+
                                 Button(action: {
-                                    // Share action
-                                    shareContent = posts[index].caption // or any other content you want to share
-                                    showShareSheet = true // Show the share sheet
+                                    shareContent = posts[index].caption
+                                    showShareSheet = true
                                 }) {
                                     Image(systemName: "paperplane")
                                         .resizable()
@@ -123,7 +122,6 @@ struct HomeScreen: View {
                                         .foregroundColor(.black)
                                 }
                                 .padding(.leading, 10)
-                                
                             }
                             .padding(.top, 5)
                             .padding(.bottom, 10)
@@ -142,15 +140,19 @@ struct HomeScreen: View {
             }
             .navigationTitle("Connectify")
             .sheet(isPresented: $showShareSheet) {
-                            ShareSheet(activityItems: [shareContent])
-                        }
+                ShareSheet(activityItems: [shareContent])
+            }
+            .sheet(item: $selectedPost) { post in
+                CommentView(post: post, onCommentAdded: { newComment in
+                    addComment(to: post, commentText: newComment)
+                })
+            }
         }
         .onAppear {
             fetchPosts()  // Fetch posts when the view appears
         }
     }
-    
-    // ShareSheet struct to present the share sheet
+
     struct ShareSheet: UIViewControllerRepresentable {
         var activityItems: [Any]
 
@@ -164,7 +166,6 @@ struct HomeScreen: View {
         }
     }
 
-    // Fetch posts from Firebase Realtime Database
     func fetchPosts() {
         let currentUserId = Auth.auth().currentUser?.uid  // Get the current user's ID
 
@@ -179,34 +180,24 @@ struct HomeScreen: View {
                    let caption = dict["caption"] as? String,
                    let timestamp = dict["timestamp"] as? Double {
 
-                    // Handle missing values for likeCount, commentCount, and likes
                     let likeCount = dict["likeCount"] as? Int ?? 0
                     let commentCount = dict["commentCount"] as? Int ?? 0
 
-                    // Check if the current user has liked this post
                     let likesDict = dict["likes"] as? [String: Bool] ?? [:]
                     let likedByCurrentUser = likesDict[currentUserId!] ?? false
 
-                    // Create the post object
                     let post = Post(postId: postId, userId: userId, postImageUrl: postImageUrl, caption: caption, likeCount: likeCount, commentCount: commentCount, timestamp: timestamp, likedByCurrentUser: likedByCurrentUser)
                     
-                    // Append to the newPosts array
                     newPosts.append(post)
                 }
             }
 
-            // Sort posts by timestamp in descending order (latest first)
             self.posts = newPosts.sorted(by: { $0.timestamp > $1.timestamp })
-
-            // Initialize loadingUsers array
             self.loadingUsers = Array(repeating: true, count: self.posts.count)
-
-            // Fetch user details for the posts
             fetchUserDetails(for: self.posts)
         }
     }
 
-    // Fetch user details for each post from Firebase
     func fetchUserDetails(for posts: [Post]) {
         for (index, post) in posts.enumerated() {
             dbRef.child("users").child(post.userId).observeSingleEvent(of: .value) { snapshot in
@@ -214,14 +205,12 @@ struct HomeScreen: View {
                    let userName = userDict["userName"] as? String,
                    let userProfileImage = userDict["userProfileImage"] as? String,
                    let imageUrl = URL(string: userProfileImage) {
-                    
-                    // Load the profile image asynchronously
+
                     URLSession.shared.dataTask(with: imageUrl) { data, response, error in
                         if let data = data, let image = UIImage(data: data) {
                             DispatchQueue.main.async {
-                                // Update the specific post with user data
                                 self.posts[index].userData = UserData(userName: userName, profileImage: image)
-                                self.loadingUsers[index] = false // Set loading to false once data is fetched
+                                self.loadingUsers[index] = false
                             }
                         }
                     }.resume()
@@ -229,37 +218,30 @@ struct HomeScreen: View {
             }
         }
     }
-    
-   
+
     func toggleLike(for post: Post, at index: Int) {
         guard let currentUserId = Auth.auth().currentUser?.uid else { return }
 
         let postRef = dbRef.child("posts").child(post.postId)
 
-        // Disable the like button to prevent multiple taps
         self.posts[index].isLikeButtonDisabled = true
 
-        // Optimistically update the like count and liked state
         var updatedPost = self.posts[index]
-        updatedPost.likedByCurrentUser.toggle()  // Toggle like/unlike state
-        updatedPost.likeCount += updatedPost.likedByCurrentUser ? 1 : -1  // Update like count
+        updatedPost.likedByCurrentUser.toggle()
+        updatedPost.likeCount += updatedPost.likedByCurrentUser ? 1 : -1
 
-        // Update only the like-related data without affecting the user profile image or username
         self.posts[index].likeCount = updatedPost.likeCount
         self.posts[index].likedByCurrentUser = updatedPost.likedByCurrentUser
 
-        // Perform Firebase transaction
         postRef.runTransactionBlock({ (currentData) -> TransactionResult in
             if var post = currentData.value as? [String: AnyObject] {
                 var likes = post["likes"] as? [String: Bool] ?? [:]
                 var likeCount = post["likeCount"] as? Int ?? 0
 
                 if likes[currentUserId] != nil {
-                    // User is unliking the post
                     likes[currentUserId] = nil
-                    likeCount = max(likeCount - 1, 0)  // Ensure the count doesn't go below zero
+                    likeCount = max(likeCount - 1, 0)
                 } else {
-                    // User is liking the post
                     likes[currentUserId] = true
                     likeCount += 1
                 }
@@ -273,27 +255,127 @@ struct HomeScreen: View {
             return TransactionResult.success(withValue: currentData)
         }) { error, committed, snapshot in
             DispatchQueue.main.async {
-                // Re-enable the like button after Firebase responds
                 self.posts[index].isLikeButtonDisabled = false
 
                 if let error = error {
-                    print("Error updating like: \(error.localizedDescription)")
-
-                    // Revert the optimistic UI update in case of error
-                    var revertedPost = self.posts[index]
-                    revertedPost.likedByCurrentUser.toggle()  // Revert like/unlike state
-                    revertedPost.likeCount += revertedPost.likedByCurrentUser ? 1 : -1  // Revert like count
-                    self.posts[index].likeCount = revertedPost.likeCount
-                    self.posts[index].likedByCurrentUser = revertedPost.likedByCurrentUser
+                    print("Error updating like count: \(error.localizedDescription)")
                 }
             }
         }
     }
 
+    func addComment(to post: Post, commentText: String) {
+        let commentId = UUID().uuidString
+        let currentUserId = Auth.auth().currentUser?.uid ?? ""
+
+        let commentData: [String: Any] = [
+            "commentId": commentId,
+            "postId": post.postId,
+            "userId": currentUserId,
+            "commentText": commentText,
+            "timestamp": ServerValue.timestamp()
+        ]
+
+        dbRef.child("comments").child(post.postId).child(commentId).setValue(commentData) { error, _ in
+            if let error = error {
+                print("Error adding comment: \(error.localizedDescription)")
+            } else {
+                updateCommentCount(for: post)
+            }
+        }
+    }
+
+    func updateCommentCount(for post: Post) {
+        let postRef = dbRef.child("posts").child(post.postId)
+        postRef.child("commentCount").setValue(post.commentCount + 1) { error, _ in
+            if let error = error {
+                print("Error updating comment count: \(error.localizedDescription)")
+            }
+        }
+    }
 }
 
 
-// Post model
+
+// CommentView to add new comments
+struct CommentView: View {
+    var post: Post
+    var onCommentAdded: (String) -> Void
+
+    @Environment(\.presentationMode) var presentationMode
+    @State private var commentText: String = ""
+
+    var body: some View {
+        NavigationView {
+            VStack {
+                // Show all previous comments if available
+                if !post.comments.isEmpty {
+                    ScrollView {
+                        ForEach(post.comments.sorted(by: { $0.timestamp < $1.timestamp })) { comment in
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack {
+                                    Text(comment.userName.isEmpty ? "Anonymous" : comment.userName)
+                                        .font(.subheadline)
+                                        .bold()
+                                    Spacer()
+                                    Text(formatTimestamp(comment.timestamp))
+                                        .font(.footnote)
+                                        .foregroundColor(.gray)
+                                }
+
+                                Text(comment.commentText)
+                                    .font(.body)
+                                    .padding(.vertical, 5)
+
+                                Divider()
+                            }
+                            .padding(.horizontal, 10)
+                        }
+                    }
+                    .padding(.top, 10)
+                } else {
+                    Text("No comments yet.")
+                        .foregroundColor(.gray)
+                        .padding(.top, 20)
+                }
+
+                // TextField for adding a new comment
+                TextField("Add a comment...", text: $commentText)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding()
+
+                Button(action: {
+                    if !commentText.isEmpty {
+                        onCommentAdded(commentText)
+                        commentText = ""
+                        // Optionally keep the view open or add a success message
+                    }
+                }) {
+                    Text("Post")
+                        .font(.headline)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+                .padding()
+            }
+            .navigationTitle("Comments")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+
+    // Helper function to format the timestamp into a readable string
+    func formatTimestamp(_ timestamp: Double) -> String {
+        let date = Date(timeIntervalSince1970: timestamp / 1000)
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
+    }
+}
+
+
 
 struct Post: Identifiable {
     let id = UUID()
@@ -304,9 +386,18 @@ struct Post: Identifiable {
     var likeCount: Int
     let commentCount: Int
     let timestamp: TimeInterval
-    var likedByCurrentUser: Bool = false  // Track if the current user has liked the post
+    var likedByCurrentUser: Bool = false
     var isLikeButtonDisabled: Bool = false
     var userData: UserData?  // Optional to store user data
+    var comments: [Comment] = []  // Add comments here
+}
+
+struct Comment: Identifiable {
+    let id: String
+    let userId: String
+    let userName: String
+    let commentText: String
+    let timestamp: TimeInterval
 }
 
 
