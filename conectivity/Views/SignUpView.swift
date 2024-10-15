@@ -8,6 +8,7 @@
 import SwiftUI
 import FirebaseStorage
 import UIKit
+
 struct SignUpView: View {
     @State private var email = ""
     @State private var password = ""
