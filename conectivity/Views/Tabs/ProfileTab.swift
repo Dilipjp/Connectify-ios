@@ -1,9 +1,3 @@
-//
-//  ProfileTab.swift
-//  conectivity
-//
-//  Created by Dilip on 2024-09-29.
-//
 import SwiftUI
 import Firebase
 import FirebaseAuth
@@ -21,7 +15,6 @@ struct ProfileScreen: View {
     @State private var isEditing = false
     @State private var isLoading = false
     @State private var successMessage: String? = nil
-    @State private var userPosts: [Post] = [] // State variable to hold user posts
 
     private var dbRef = Database.database().reference()
 
@@ -132,35 +125,12 @@ struct ProfileScreen: View {
                         .cornerRadius(10)
                 }
 
-                // User's Posts Section
-                Text("Your Posts")
-                    .font(.title)
-                    .fontWeight(.bold)
-
-                // Display user posts in a grid
-                LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 3), spacing: 10) {
-                    ForEach(userPosts) { post in
-                        if let url = URL(string: post.postImageUrl) {
-                            AsyncImage(url: url) { image in
-                                image
-                                    .resizable()
-                                    .scaledToFit()
-                                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                            } placeholder: {
-                                ProgressView()
-                            }
-                        }
-                    }
-                }
-                .padding()
-
                 Spacer()
             }
         }
         .padding()
         .onAppear {
             fetchUserProfile()
-            fetchUserPosts() // Fetch user posts when the view appears
         }
     }
 
@@ -190,27 +160,6 @@ struct ProfileScreen: View {
         }
     }
 
-    // Fetch user posts from Firebase
-    func fetchUserPosts() {
-        guard let user = Auth.auth().currentUser else { return }
-
-        dbRef.child("posts").queryOrdered(byChild: "userId").queryEqual(toValue: user.uid).observeSingleEvent(of: .value) { snapshot in
-            var posts: [Post] = []
-            for child in snapshot.children {
-                if let childSnapshot = child as? DataSnapshot,
-                   let postDict = childSnapshot.value as? [String: Any],
-                   let postImageUrl = postDict["postImageUrl"] as? String,
-                   let caption = postDict["caption"] as? String,
-                   let timestamp = postDict["timestamp"] as? Int {
-                    
-                    let post = Post(id: childSnapshot.key, userId: user.uid, postImageUrl: postImageUrl, caption: caption, timestamp: timestamp)
-                    posts.append(post)
-                }
-            }
-            self.userPosts = posts // Update the state with fetched posts
-        }
-    }
-    
     // Log out the user
     func logOut() {
         do {
@@ -312,10 +261,3 @@ struct ProfileScreen: View {
         }
     }
 }
-
-
-
-
-
-
-
