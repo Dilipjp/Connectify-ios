@@ -138,27 +138,49 @@ struct ProfileScreen: View {
     func fetchUserProfile() {
         guard let user = Auth.auth().currentUser else { return }
 
-        // Fetch the username and profile image from Firebase Authentication
-        username = user.displayName ?? "Your Awesome Name"
-
-        if let photoURL = user.photoURL {
-            URLSession.shared.dataTask(with: photoURL) { data, _, _ in
-                if let data = data, let image = UIImage(data: data) {
+        // Fetch the user details (username and profile image) from the "users" node in Firebase Realtime Database
+        dbRef.child("users").child(user.uid).observeSingleEvent(of: .value) { snapshot in
+            if let value = snapshot.value as? [String: Any] {
+                // Fetch the username
+                if let fetchedUsername = value["userName"] as? String {
                     DispatchQueue.main.async {
-                        profileImage = image
+                        self.username = fetchedUsername
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        self.username = "Your Awesome Name" // Fallback if no username is found
                     }
                 }
-            }.resume()
-        }
 
-        // Fetch user bio from Firebase Realtime Database
-        dbRef.child("users").child(user.uid).observeSingleEvent(of: .value) { snapshot in
-            if let value = snapshot.value as? [String: Any],
-               let bio = value["userBio"] as? String {
-                userBio = bio
+                // Fetch the profile image URL
+                if let profileImageUrlString = value["userProfileImage"] as? String,
+                   let profileImageUrl = URL(string: profileImageUrlString) {
+                    // Download the image asynchronously
+                    URLSession.shared.dataTask(with: profileImageUrl) { data, _, _ in
+                        if let data = data, let image = UIImage(data: data) {
+                            DispatchQueue.main.async {
+                                self.profileImage = image
+                            }
+                        }
+                    }.resume()
+                }
+
+                // Fetch user bio if needed
+                if let fetchedBio = value["userBio"] as? String {
+                    DispatchQueue.main.async {
+                        self.userBio = fetchedBio
+                    }
+                }
+            } else {
+                DispatchQueue.main.async {
+                    // Handle case where user data is not found
+                    self.username = "Your Awesome Name"
+                    self.userBio = "No bio available"
+                }
             }
         }
     }
+
 
     // Log out the user
     func logOut() {
