@@ -1,3 +1,8 @@
+//
+//  ProfileTab.swift
+//  conectivity
+//
+//  Created by Dilip on 2024-09-29.
 import SwiftUI
 import Firebase
 import FirebaseAuth
@@ -5,14 +10,12 @@ import FirebaseDatabase
 
 struct FollowersScreen: View {
     @State private var allUsers: [User] = []
-//    @State private var currentUserId: String = "YgvEmYTBAuQslnzSYs5n0oh25eE3" // Your current user ID
-    @State private var currentUserId: String = "" // Empty initially
-
-    @State private var followers: [String: Bool] = [:] // To store follow/unfollow status
+    @State private var currentUserId: String = ""
+    @State private var followers: [String: Bool] = [:]
 
     var body: some View {
         List(allUsers) { user in
-            if user.userId != currentUserId { // Don't show current user
+            if user.userId != currentUserId { 
                 HStack {
                     // Display profile image
                     AsyncImage(url: URL(string: user.userProfileImage)) { image in
@@ -50,7 +53,7 @@ struct FollowersScreen: View {
             }
         }
         .onAppear {
-            fetchCurrentUserId() // Fetch the current user ID
+            fetchCurrentUserId() 
             loadAllUsers()
         }
     }

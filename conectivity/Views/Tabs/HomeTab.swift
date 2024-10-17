@@ -295,7 +295,7 @@ struct HomeScreen: View {
     }
 }
 
-
+// CommentView to add new comments
 
 // CommentView to add new comments
 struct CommentView: View {
@@ -406,3 +406,4 @@ struct UserData {
     let userName: String
     let profileImage: UIImage
 }
+
