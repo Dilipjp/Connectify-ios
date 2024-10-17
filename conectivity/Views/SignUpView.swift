@@ -8,13 +8,14 @@
 import SwiftUI
 import FirebaseStorage
 import UIKit
+
 struct SignUpView: View {
     @State private var email = ""
     @State private var password = ""
     @State private var confirmPassword = ""
     @State private var userName = ""
     @State private var userBio = ""
-    @State private var selectedRole = "User" // Default role
+    @State private var selectedRole = "User" 
     @State private var selectedImage: UIImage?
     @State private var showImagePicker = false
     @State private var errorMessage = ""
