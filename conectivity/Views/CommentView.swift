@@ -1,8 +1,8 @@
 //
 //  CommentView.swift
-//  connectify
+//  conectivity
 //
-//  Created by Dilip on 2024-10-15.
+//  Created by Dilip on 2024-10-17.
 //
 
 import SwiftUI
@@ -10,99 +10,287 @@ import Firebase
 import FirebaseDatabase
 import FirebaseAuth
 
-struct CommentView: View {
-    let postId: String
-    
-    // Make sure all state variables and database references are accessible
-    @State private var comments: [String: Comment] = [:]
-    @State private var newCommentText: String = ""
-    @State private var isLoading = true
-    private var dbRef = Database.database().reference()
+struct Comment1: Identifiable {
+    var id: String
+    var commentText: String
+    var timestamp: TimeInterval
+    var userId: String
+    var userName: String?
+    var userProfileImage: String?
+}
 
-    // Explicitly declare the public initializer
-    init(postId: String) {
-        self.postId = postId
-    }
+struct CommentView: View {
+    var postId: String
+    @State private var comments: [Comment1] = []
+    @State private var isLoading = true
+    @State private var newCommentText = ""
+    @State private var isSubmitting = false
+    @State private var editingCommentId: String? = nil
+    @State private var currentUserId: String? = nil
 
     var body: some View {
         VStack {
             if isLoading {
-                ProgressView()
+                ProgressView("Loading Comments...")
+            } else if comments.isEmpty {
+                Text("No comments available")
+                    .font(.headline)
+                    .padding()
             } else {
-                List {
-                    ForEach(comments.keys.sorted(), id: \.self) { key in
-                        if let comment = comments[key] {
-                            HStack {
-                                Text(comment.userName)
-                                    .font(.headline)
-                                    .foregroundColor(.blue)
-                                Text(comment.commentText)
-                                    .font(.body)
-                                    .foregroundColor(.black)
+                ScrollView {
+                    VStack(spacing: 15) {
+                        ForEach(comments, id: \.id) { comment in
+                            HStack(alignment: .top, spacing: 12) {
+                                if let userProfileImage = comment.userProfileImage {
+                                    AsyncImage(url: URL(string: userProfileImage)) { image in
+                                        image
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: 50, height: 50)
+                                            .clipShape(Circle())
+                                            .overlay(Circle().stroke(Color.gray.opacity(0.5), lineWidth: 1))
+                                    } placeholder: {
+                                        Circle()
+                                            .fill(Color.gray.opacity(0.5))
+                                            .frame(width: 50, height: 50)
+                                    }
+                                }
+
+                                VStack(alignment: .leading, spacing: 5) {
+                                    if let userName = comment.userName {
+                                        Text(userName)
+                                            .font(.headline)
+                                    }
+                                    Text(comment.commentText)
+                                        .font(.subheadline)
+                                        .foregroundColor(.black)
+                                    
+                                    if let commentTimestamp = formatTimestamp(comment.timestamp) {
+                                        Text(commentTimestamp)
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+                                    }
+                                }
+
+                                Spacer()
+
+                                // Show edit/delete options if the comment belongs to the current user
+                                if comment.userId == currentUserId {
+                                    Menu {
+                                        Button(action: {
+                                            // Trigger editing mode
+                                            editingCommentId = comment.id
+                                            newCommentText = comment.commentText
+                                        }) {
+                                            Text("Edit")
+                                        }
+                                        Button(action: {
+                                            // Delete comment
+                                            deleteComment(commentId: comment.id)
+                                        }) {
+                                            Text("Delete").foregroundColor(.red)
+                                        }
+                                    } label: {
+                                        Image(systemName: "ellipsis")
+                                            .padding()
+                                            .foregroundColor(.gray)
+                                    }
+                                }
                             }
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(10)
+                            .shadow(color: Color.gray.opacity(0.3), radius: 4, x: 0, y: 2)
                         }
                     }
+                    .padding(.horizontal)
                 }
-                .listStyle(PlainListStyle())
-                
+            }
+
+            // New Comment Input
+            VStack {
                 HStack {
-                    TextField("Add a comment...", text: $newCommentText)
+                    TextField(editingCommentId == nil ? "Add a comment..." : "Edit your comment...", text: $newCommentText)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .padding(.horizontal)
                     
                     Button(action: {
-                        addComment()
+                        if editingCommentId != nil {
+                            // Edit the comment
+                            updateComment(commentId: editingCommentId!)
+                        } else {
+                            // Add a new comment
+                            submitComment()
+                        }
                     }) {
-                        Text("Send")
+                        if isSubmitting {
+                            ProgressView()
+                        } else {
+                            Text(editingCommentId == nil ? "Post" : "Update")
+                                .bold()
+                        }
                     }
+                    .padding(.horizontal)
+                    .disabled(newCommentText.isEmpty || isSubmitting)
                 }
-                .padding()
+                .padding(.bottom, 10)
             }
         }
-        .navigationTitle("Comments")
-        .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            fetchComments()
+            fetchComments(for: postId)
+            fetchCurrentUserId()
+        }
+        .navigationBarTitle("Comments", displayMode: .inline)
+        .background(Color(UIColor.systemGroupedBackground))
+    }
+    
+    // Fetch the current user's ID
+    func fetchCurrentUserId() {
+        if let user = Auth.auth().currentUser {
+            currentUserId = user.uid
         }
     }
 
-    func fetchComments() {
-        dbRef.child("posts").child(postId).child("comments").observeSingleEvent(of: .value) { snapshot in
-            if let commentsDict = snapshot.value as? [String: Any] {
-                for (key, value) in commentsDict {
-                    if let commentData = value as? [String: Any],
-                       let commentText = commentData["commentText"] as? String,
-                       let userId = commentData["userId"] as? String,
-                       let userName = commentData["userName"] as? String {
-                        let comment = Comment(commentText: commentText, userId: userId, userName: userName)
-                        self.comments[key] = comment
+    // Submit a new comment
+    func submitComment() {
+        guard let user = Auth.auth().currentUser else { return }
+        isSubmitting = true
+        let commentId = UUID().uuidString
+        let timestamp = Date().timeIntervalSince1970 * 1000 // milliseconds
+        
+        let newComment = [
+            "commentText": newCommentText,
+            "timestamp": timestamp,
+            "userId": user.uid
+        ] as [String: Any]
+        
+        let ref = Database.database().reference().child("posts").child(postId).child("comments").child(commentId)
+        
+        ref.setValue(newComment) { error, _ in
+            if let error = error {
+                print("Error submitting comment: \(error)")
+            } else {
+                fetchUserDetails(for: user.uid) { userName, userProfileImage in
+                    let comment = Comment1(
+                        id: commentId,
+                        commentText: newCommentText,
+                        timestamp: timestamp,
+                        userId: user.uid,
+                        userName: userName,
+                        userProfileImage: userProfileImage
+                    )
+                    self.comments.append(comment)
+                    self.newCommentText = ""
+                }
+            }
+            isSubmitting = false
+        }
+    }
+
+    // Update an existing comment
+    func updateComment(commentId: String) {
+        guard let user = Auth.auth().currentUser else { return }
+        isSubmitting = true
+        let timestamp = Date().timeIntervalSince1970 * 1000 // milliseconds
+        
+        let updatedComment = [
+            "commentText": newCommentText,
+            "timestamp": timestamp,
+            "userId": user.uid
+        ] as [String: Any]
+        
+        let ref = Database.database().reference().child("posts").child(postId).child("comments").child(commentId)
+        
+        ref.updateChildValues(updatedComment) { error, _ in
+            if let error = error {
+                print("Error updating comment: \(error)")
+            } else {
+                // Update the comment in the local list
+                if let index = self.comments.firstIndex(where: { $0.id == commentId }) {
+                    self.comments[index].commentText = newCommentText
+                    self.comments[index].timestamp = timestamp
+                }
+                self.newCommentText = ""
+                self.editingCommentId = nil
+            }
+            isSubmitting = false
+        }
+    }
+
+    // Delete a comment
+    func deleteComment(commentId: String) {
+        let ref = Database.database().reference().child("posts").child(postId).child("comments").child(commentId)
+        
+        ref.removeValue { error, _ in
+            if let error = error {
+                print("Error deleting comment: \(error)")
+            } else {
+                // Remove the comment from the local list
+                self.comments.removeAll { $0.id == commentId }
+            }
+        }
+    }
+
+    // Fetch comments for the given postId
+    func fetchComments(for postId: String) {
+        let ref = Database.database().reference().child("posts").child(postId).child("comments")
+        
+        ref.observeSingleEvent(of: .value) { snapshot in
+            var fetchedComments: [Comment1] = []
+            
+            if let commentsData = snapshot.value as? [String: [String: Any]] {
+                for (commentId, commentDict) in commentsData {
+                    if let commentText = commentDict["commentText"] as? String,
+                       let timestamp = commentDict["timestamp"] as? TimeInterval,
+                       let userId = commentDict["userId"] as? String {
+                        
+                        let comment = Comment1(id: commentId, commentText: commentText, timestamp: timestamp, userId: userId)
+                        fetchUserDetails(for: userId) { userName, userProfileImage in
+                            if let index = fetchedComments.firstIndex(where: { $0.id == commentId }) {
+                                fetchedComments[index].userName = userName
+                                fetchedComments[index].userProfileImage = userProfileImage
+                                self.comments = fetchedComments
+                            }
+                        }
+                        fetchedComments.append(comment)
                     }
                 }
+                self.comments = fetchedComments.sorted(by: { $0.timestamp < $1.timestamp })
             }
             self.isLoading = false
         }
     }
 
-    func addComment() {
-        guard !newCommentText.isEmpty, let userId = Auth.auth().currentUser?.uid else { return }
+    // Fetch user details
+    func fetchUserDetails(for userId: String, completion: @escaping (String?, String?) -> Void) {
+        let userRef = Database.database().reference().child("users").child(userId)
         
-        let commentId = UUID().uuidString
-        let comment = ["commentText": newCommentText, "userId": userId, "userName": "YourName"] // Replace "YourName" with actual user name logic
-
-        dbRef.child("posts").child(postId).child("comments").child(commentId).setValue(comment) { error, _ in
-            if let error = error {
-                print("Error adding comment: \(error.localizedDescription)")
+        userRef.observeSingleEvent(of: .value) { snapshot in
+            if let userData = snapshot.value as? [String: Any] {
+                let userName = userData["userName"] as? String
+                let userProfileImage = userData["userProfileImage"] as? String
+                completion(userName, userProfileImage)
             } else {
-                newCommentText = ""
-                fetchComments() // Optionally refresh comments here
+                completion(nil, nil)
             }
         }
     }
+
+    // Helper function to format the timestamp
+    func formatTimestamp(_ timestamp: TimeInterval) -> String? {
+        let date = Date(timeIntervalSince1970: timestamp / 1000)
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
+    }
 }
 
-struct Comment {
-    let commentText: String
-    let userId: String
-    let userName: String
+struct CommentView_Previews: PreviewProvider {
+    static var previews: some View {
+        NavigationView {
+            CommentView(postId: "examplePostId")
+        }
+    }
 }
-
 
