@@ -2,7 +2,8 @@
 //  LocationSearchView.swift
 //  conectivity
 //
-//  Created by Subash Gaddam on 2024-10-17.
+
+//  Created by Dilip on 2024-10-17.
 //
 
 
@@ -80,3 +81,4 @@ struct LocationSearchView: View {
         let description: String
     }
 }
+
