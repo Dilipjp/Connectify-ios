@@ -16,6 +16,7 @@ struct EditPostView: View {
     @Binding var post: Post
     @State private var newCaption: String = ""
     @State private var newPostImage: UIImage? // State for new image
+    @State private var showImagePicker = false // State to show the image picker
     @State private var isLoading = false
 
     var body: some View {
@@ -42,7 +43,7 @@ struct EditPostView: View {
 
             // Button to select a new image
             Button(action: {
-                selectImage() // Action to present image picker
+                showImagePicker = true // Action to present image picker
             }) {
                 Text("Select New Image")
                     .foregroundColor(.blue)
@@ -70,8 +71,13 @@ struct EditPostView: View {
             newCaption = post.caption // Load the current caption
         }
         .padding()
-        .sheet(isPresented: $isLoading) {
+        .sheet(isPresented: $showImagePicker) {
             ImagePicker(image: $newPostImage) // Present image picker
+        }
+        .overlay {
+            if isLoading {
+                ProgressView("Updating...").progressViewStyle(CircularProgressViewStyle())
+            }
         }
     }
 
@@ -81,21 +87,15 @@ struct EditPostView: View {
             print("User not logged in")
             return
         }
+
+        isLoading = true
         
         // Check if there's a new image to upload
         if let image = newPostImage {
             uploadImageAndSavePost(image: image, userId: user.uid)
         } else {
             // If no new image, just update the caption
-            let dbRef = Database.database().reference().child("posts").child(post.postId)
-            dbRef.updateChildValues(["caption": newCaption]) { error, _ in
-                if let error = error {
-                    print("Error updating post: \(error.localizedDescription)")
-                } else {
-                    print("Post updated successfully!")
-                    presentationMode.wrappedValue.dismiss() // Dismiss the view after updating
-                }
-            }
+            savePost(caption: newCaption.isEmpty ? post.caption : newCaption)
         }
     }
 
@@ -104,8 +104,6 @@ struct EditPostView: View {
         
         // Use the existing post ID to update the post image
         let storageRef = Storage.storage().reference().child("post_images/\(post.postId).jpg")
-
-        isLoading = true // Show loading indicator
 
         // Upload image to Firebase Storage
         storageRef.putData(imageData, metadata: nil) { _, error in
@@ -125,32 +123,31 @@ struct EditPostView: View {
 
                 if let url = url {
                     // Update post data with new caption and image URL
-                    let postData: [String: Any] = [
-                        "caption": newCaption,
-                        "postImageUrl": url.absoluteString,
-                    ]
-
-                    // Save updated post data to Realtime Database
-                    let dbRef = Database.database().reference().child("posts").child(post.postId)
-                    dbRef.updateChildValues(postData) { error, _ in
-                        isLoading = false
-
-                        if let error = error {
-                            print("Error updating post: \(error.localizedDescription)")
-                        } else {
-                            print("Post updated successfully!")
-                            presentationMode.wrappedValue.dismiss() // Dismiss the view after updating
-                        }
-                    }
+                    let updatedCaption = newCaption.isEmpty ? post.caption : newCaption
+                    savePost(caption: updatedCaption, imageUrl: url.absoluteString)
                 }
             }
         }
     }
-    
-    private func selectImage() {
-        // Implement your image selection logic (using UIImagePickerController)
-        // This would typically involve showing the image picker to allow users to choose an image
-        // Since `isLoading` is used for the image picker, set it to true to show the picker.
-        isLoading = true
+
+    private func savePost(caption: String, imageUrl: String? = nil) {
+        var postData: [String: Any] = ["caption": caption]
+
+        if let imageUrl = imageUrl {
+            postData["postImageUrl"] = imageUrl
+        }
+
+        let dbRef = Database.database().reference().child("posts").child(post.postId)
+        dbRef.updateChildValues(postData) { error, _ in
+            isLoading = false
+
+            if let error = error {
+                print("Error updating post: \(error.localizedDescription)")
+            } else {
+                print("Post updated successfully!")
+                presentationMode.wrappedValue.dismiss() // Dismiss the view after updating
+            }
+        }
     }
 }
+

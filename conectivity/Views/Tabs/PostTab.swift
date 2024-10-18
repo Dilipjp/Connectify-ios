@@ -15,6 +15,8 @@ struct PostScreen: View {
     @State private var isImagePickerPresented = false
     @State private var isLoading = false
     @State private var successMessage: String? = nil
+    @State private var selectedLocation: String? = nil
+    @State private var isLocationSearchPresented = false
 
     var body: some View {
         VStack(spacing: 20) {
@@ -45,6 +47,22 @@ struct PostScreen: View {
             TextField("Caption", text: $caption)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
+
+            Button(action: {
+                isLocationSearchPresented = true
+            }) {
+                HStack {
+                    Image(systemName: "mappin.and.ellipse")
+                    Text(selectedLocation ?? "Select Location")
+                }
+                .foregroundColor(.blue)
+                .padding()
+                .background(Color.blue.opacity(0.1))
+                .cornerRadius(10)
+            }
+            .sheet(isPresented: $isLocationSearchPresented) {
+                LocationSearchView(selectedLocation: $selectedLocation)
+            }
 
             Button(action: {
                 savePost()
@@ -120,7 +138,8 @@ struct PostScreen: View {
                         "postId": postId,
                         "postImageUrl": url.absoluteString,
                         "timestamp": timestamp,
-                        "userId": user.uid
+                        "userId": user.uid,
+                        "locationName": selectedLocation ?? "" // Save the selected location
                     ]
 
                     // Save post data to Realtime Database
@@ -135,6 +154,7 @@ struct PostScreen: View {
                             // Clear fields after posting
                             caption = ""
                             postImage = nil
+                            selectedLocation = nil // Clear location
 
                             // Show success message
                             successMessage = "Post created successfully!"
@@ -149,6 +169,7 @@ struct PostScreen: View {
         }
     }
 }
+
 
 
 
