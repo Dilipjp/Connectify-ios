@@ -75,9 +75,21 @@ struct HomeScreen: View {
                             }
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
+                            
+                            // Display Post Location Name with Icon
+                           
+                                HStack {
+                                    Image(systemName: "mappin.and.ellipse") // Location icon
+                                        .foregroundColor(.red)
+                                    Text(posts[index].locationName)
+                                        .font(.subheadline)
+                                        .foregroundColor(.gray)
+                                }
+                                .padding(.horizontal, 10)
 
                             // Like, Comment, Share Icons with Count
                             HStack {
+                                // Like Button
                                 Button(action: {
                                     toggleLike(for: posts[index], at: index)
                                 }) {
@@ -95,10 +107,8 @@ struct HomeScreen: View {
                                 .disabled(posts[index].isLikeButtonDisabled)
                                 .padding(.leading, 10)
 
-                                Button(action: {
-                                    selectedPost = posts[index]
-                                    showCommentSheet = true
-                                }) {
+                                // Comment Button with NavigationLink
+                                NavigationLink(destination: CommentView(postId: posts[index].postId)) {
                                     HStack {
                                         Image(systemName: "message")
                                             .resizable()
@@ -112,6 +122,7 @@ struct HomeScreen: View {
                                 }
                                 .padding(.leading, 10)
 
+                                // Share Button
                                 Button(action: {
                                     shareContent = posts[index].caption
                                     showShareSheet = true
@@ -142,16 +153,12 @@ struct HomeScreen: View {
             .sheet(isPresented: $showShareSheet) {
                 ShareSheet(activityItems: [shareContent])
             }
-            .sheet(item: $selectedPost) { post in
-                CommentView(post: post, onCommentAdded: { newComment in
-                    addComment(to: post, commentText: newComment)
-                })
+            .onAppear {
+                fetchPosts()  // Fetch posts when the view appears
             }
         }
-        .onAppear {
-            fetchPosts()  // Fetch posts when the view appears
-        }
     }
+
 
     struct ShareSheet: UIViewControllerRepresentable {
         var activityItems: [Any]
@@ -178,6 +185,8 @@ struct HomeScreen: View {
                    let userId = dict["userId"] as? String,
                    let postImageUrl = dict["postImageUrl"] as? String,
                    let caption = dict["caption"] as? String,
+                   let locationName = dict["locationName"] as? String,
+                   
                    let timestamp = dict["timestamp"] as? Double {
 
                     let likeCount = dict["likeCount"] as? Int ?? 0
@@ -186,7 +195,7 @@ struct HomeScreen: View {
                     let likesDict = dict["likes"] as? [String: Bool] ?? [:]
                     let likedByCurrentUser = likesDict[currentUserId!] ?? false
 
-                    let post = Post(postId: postId, userId: userId, postImageUrl: postImageUrl, caption: caption, likeCount: likeCount, commentCount: commentCount, timestamp: timestamp, likedByCurrentUser: likedByCurrentUser)
+                    let post = Post(postId: postId, userId: userId, postImageUrl: postImageUrl,locationName: locationName, caption: caption, likeCount: likeCount, commentCount: commentCount, timestamp: timestamp, likedByCurrentUser: likedByCurrentUser)
                     
                     newPosts.append(post)
                 }
@@ -264,26 +273,6 @@ struct HomeScreen: View {
         }
     }
 
-    func addComment(to post: Post, commentText: String) {
-        let commentId = UUID().uuidString
-        let currentUserId = Auth.auth().currentUser?.uid ?? ""
-
-        let commentData: [String: Any] = [
-            "commentId": commentId,
-            "postId": post.postId,
-            "userId": currentUserId,
-            "commentText": commentText,
-            "timestamp": ServerValue.timestamp()
-        ]
-
-        dbRef.child("comments").child(post.postId).child(commentId).setValue(commentData) { error, _ in
-            if let error = error {
-                print("Error adding comment: \(error.localizedDescription)")
-            } else {
-                updateCommentCount(for: post)
-            }
-        }
-    }
 
     func updateCommentCount(for post: Post) {
         let postRef = dbRef.child("posts").child(post.postId)
@@ -295,85 +284,6 @@ struct HomeScreen: View {
     }
 }
 
-// CommentView to add new comments
-
-// CommentView to add new comments
-struct CommentView: View {
-    var post: Post
-    var onCommentAdded: (String) -> Void
-
-    @Environment(\.presentationMode) var presentationMode
-    @State private var commentText: String = ""
-
-    var body: some View {
-        NavigationView {
-            VStack {
-                // Show all previous comments if available
-                if !post.comments.isEmpty {
-                    ScrollView {
-                        ForEach(post.comments.sorted(by: { $0.timestamp < $1.timestamp })) { comment in
-                            VStack(alignment: .leading, spacing: 8) {
-                                HStack {
-                                    Text(comment.userName.isEmpty ? "Anonymous" : comment.userName)
-                                        .font(.subheadline)
-                                        .bold()
-                                    Spacer()
-                                    Text(formatTimestamp(comment.timestamp))
-                                        .font(.footnote)
-                                        .foregroundColor(.gray)
-                                }
-
-                                Text(comment.commentText)
-                                    .font(.body)
-                                    .padding(.vertical, 5)
-
-                                Divider()
-                            }
-                            .padding(.horizontal, 10)
-                        }
-                    }
-                    .padding(.top, 10)
-                } else {
-                    Text("No comments yet.")
-                        .foregroundColor(.gray)
-                        .padding(.top, 20)
-                }
-
-                // TextField for adding a new comment
-                TextField("Add a comment...", text: $commentText)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding()
-
-                Button(action: {
-                    if !commentText.isEmpty {
-                        onCommentAdded(commentText)
-                        commentText = ""
-                        // Optionally keep the view open or add a success message
-                    }
-                }) {
-                    Text("Post")
-                        .font(.headline)
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
-                .padding()
-            }
-            .navigationTitle("Comments")
-            .navigationBarTitleDisplayMode(.inline)
-        }
-    }
-
-    // Helper function to format the timestamp into a readable string
-    func formatTimestamp(_ timestamp: Double) -> String {
-        let date = Date(timeIntervalSince1970: timestamp / 1000)
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .short
-        return formatter.string(from: date)
-    }
-}
 
 
 
@@ -382,6 +292,7 @@ struct Post: Identifiable {
     let postId: String
     let userId: String
     let postImageUrl: String
+    let locationName: String
     let caption: String
     var likeCount: Int
     let commentCount: Int
@@ -406,4 +317,3 @@ struct UserData {
     let userName: String
     let profileImage: UIImage
 }
-
