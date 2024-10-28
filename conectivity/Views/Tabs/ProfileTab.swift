@@ -15,6 +15,8 @@ struct ProfileScreen: View {
     @State private var isEditing = false
     @State private var isLoading = false
     @State private var successMessage: String? = nil
+    @State private var userRole: String = ""
+
 
     private var dbRef = Database.database().reference()
 
@@ -116,6 +118,17 @@ struct ProfileScreen: View {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                                 successMessage = nil
                             }
+                            if userRole == "Moderator" {
+                                                                        NavigationLink(destination: AllPostsView()) { // Link to AllPostsView
+                                                                            Text("All Posts")
+                                                                                .font(.headline)
+                                                                                .padding()
+                                                                                .frame(maxWidth: .infinity)
+                                                                                .background(Color.black)
+                                                                                .foregroundColor(.white)
+                                                                                .cornerRadius(10)
+                                                                        }
+                                                                    }
                         })
                     }
                     
