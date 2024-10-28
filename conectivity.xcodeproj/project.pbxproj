@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		5561D0682CCF036200422EB8 /* AllPostsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5561D0672CCF036200422EB8 /* AllPostsView.swift */; };
+		5FD6708D2CD003E500018605 /* AllUsersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD6708C2CD003E200018605 /* AllUsersView.swift */; };
 		DA7B94A82CBF7D77009C6BBA /* UserPostsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7B94A72CBF7D77009C6BBA /* UserPostsView.swift */; };
 		DA7B94AA2CBF8BA5009C6BBA /* EditPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7B94A92CBF8BA5009C6BBA /* EditPostView.swift */; };
 		DA7B94AC2CC0D022009C6BBA /* CommentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7B94AB2CC0D022009C6BBA /* CommentView.swift */; };
@@ -56,6 +57,7 @@
 
 /* Begin PBXFileReference section */
 		5561D0672CCF036200422EB8 /* AllPostsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllPostsView.swift; sourceTree = "<group>"; };
+		5FD6708C2CD003E200018605 /* AllUsersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllUsersView.swift; sourceTree = "<group>"; };
 		DA7B94A72CBF7D77009C6BBA /* UserPostsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPostsView.swift; sourceTree = "<group>"; };
 		DA7B94A92CBF8BA5009C6BBA /* EditPostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPostView.swift; sourceTree = "<group>"; };
 		DA7B94AB2CC0D022009C6BBA /* CommentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentView.swift; sourceTree = "<group>"; };
@@ -117,6 +119,7 @@
 		DA7ED5662CA9F281008C91D8 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				5FD6708C2CD003E200018605 /* AllUsersView.swift */,
 				DA7ED5852CAA01F7008C91D8 /* Tabs */,
 				DA7ED5792CA9F9D4008C91D8 /* SplashView.swift */,
 				DA7ED57B2CA9F9FF008C91D8 /* SignInView.swift */,
@@ -362,6 +365,7 @@
 				DA7ED5932CAA2356008C91D8 /* EditProfileView.swift in Sources */,
 				DA7B94AC2CC0D022009C6BBA /* CommentView.swift in Sources */,
 				DA7ED5912CAA0C2A008C91D8 /* ImagePicker.swift in Sources */,
+				5FD6708D2CD003E500018605 /* AllUsersView.swift in Sources */,
 				DAC7C7082C995A640032853B /* ContentView.swift in Sources */,
 				DA7ED58D2CAA0450008C91D8 /* PostTab.swift in Sources */,
 				DA7B94AA2CBF8BA5009C6BBA /* EditPostView.swift in Sources */,
