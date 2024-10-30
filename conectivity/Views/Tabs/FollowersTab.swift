@@ -74,8 +74,11 @@ struct FollowersScreen: View {
                 var tempUsers: [User] = []
                 for (key, value) in usersData {
                     if let userData = value as? [String: Any],
+                       let userRole = userData["userRole"] as? String,
+                       userRole == "User",  // Only include users with userRole == "user"
                        let userName = userData["userName"] as? String,
                        let userProfileImage = userData["userProfileImage"] as? String {
+                        
                         let user = User(userId: key, userName: userName, userProfileImage: userProfileImage)
                         tempUsers.append(user)
 

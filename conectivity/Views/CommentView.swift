@@ -199,6 +199,7 @@ struct CommentView: View {
 //    }
 
     // Update an existing comment
+    
     func updateComment(commentId: String) {
         guard let user = Auth.auth().currentUser else { return }
         isSubmitting = true
