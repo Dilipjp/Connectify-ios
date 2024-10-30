@@ -21,7 +21,7 @@ struct ProfileScreen: View {
     @State private var isEditing = false
     @State private var isLoading = false
     @State private var successMessage: String? = nil
-
+    @State private var userRole: String = ""
     private var dbRef = Database.database().reference()
 
     var body: some View {
@@ -67,13 +67,6 @@ struct ProfileScreen: View {
                         .padding(.horizontal)
                     // Post, Followers, and Following counts in a row
                     HStack(spacing: 30) {
-//                        VStack {
-//                            Text("\(postCount)")
-//                                .font(.headline)
-//                            Text("Posts")
-//                                .font(.subheadline)
-//                                .foregroundColor(.gray)
-//                        }
                         NavigationLink(destination: UserPostsView()) {
                                 VStack {
                                     Text("\(postCount)")
@@ -124,6 +117,39 @@ struct ProfileScreen: View {
                             }
                         })
                     }
+                    // Conditional Navigation Buttons
+                                    if userRole == "Moderator" {
+                                        NavigationLink(destination: AllPostsView()) {
+                                            Text("All Posts")
+                                                .font(.headline)
+                                                .padding()
+                                                .frame(maxWidth: .infinity)
+                                                .background(Color.black)
+                                                .foregroundColor(.white)
+                                                .cornerRadius(10)
+                                        }
+                                    } else if userRole == "Admin" {
+                                        NavigationLink(destination: AllUsersView()) {
+                                            Text("All Users")
+                                                .font(.headline)
+                                                .padding()
+                                                .frame(maxWidth: .infinity)
+                                                .background(Color.black)
+                                                .foregroundColor(.white)
+                                                .cornerRadius(10)
+                                        }
+                                    }
+//                    if userRole == "Moderator" {
+//                                            NavigationLink(destination: AllPostsView()) { // Link to AllPostsView
+//                                                Text("All Posts")
+//                                                    .font(.headline)
+//                                                    .padding()
+//                                                    .frame(maxWidth: .infinity)
+//                                                    .background(Color.black)
+//                                                    .foregroundColor(.white)
+//                                                    .cornerRadius(10)
+//                                            }
+//                                        }
                     
                     // Success message
                     if let successMessage = successMessage {
@@ -144,15 +170,6 @@ struct ProfileScreen: View {
                     }
                     
                     Spacer()
-//                    NavigationLink(destination: UserPostsView()) {
-//                        Text("View My Posts")
-//                            .font(.headline)
-//                            .padding()
-//                            .frame(maxWidth: .infinity)
-//                            .background(Color.black)
-//                            .foregroundColor(.white)
-//                            .cornerRadius(10)
-//                    }
                 }
             }
             .padding()
@@ -182,7 +199,7 @@ struct ProfileScreen: View {
                         self.username = "Your Awesome Name" // Fallback if no username is found
                     }
                 }
-
+                self.userRole = value["userRole"] as? String ?? "" 
                 // Fetch the profile image URL
                 if let profileImageUrlString = value["userProfileImage"] as? String,
                    let profileImageUrl = URL(string: profileImageUrlString) {
