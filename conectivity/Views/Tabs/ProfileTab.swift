@@ -16,7 +16,7 @@ struct ProfileScreen: View {
     @State private var isLoading = false
     @State private var successMessage: String? = nil
     @State private var userRole: String = ""
-    @State private var userRole: String = ""
+   
 
     private var dbRef = Database.database().reference()
 
