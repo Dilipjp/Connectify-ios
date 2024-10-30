@@ -139,17 +139,6 @@ struct ProfileScreen: View {
                                                 .cornerRadius(10)
                                         }
                                     }
-//                    if userRole == "Moderator" {
-//                                            NavigationLink(destination: AllPostsView()) { // Link to AllPostsView
-//                                                Text("All Posts")
-//                                                    .font(.headline)
-//                                                    .padding()
-//                                                    .frame(maxWidth: .infinity)
-//                                                    .background(Color.black)
-//                                                    .foregroundColor(.white)
-//                                                    .cornerRadius(10)
-//                                            }
-//                                        }
                     
                     // Success message
                     if let successMessage = successMessage {

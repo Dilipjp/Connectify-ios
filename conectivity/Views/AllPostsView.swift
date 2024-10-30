@@ -2,7 +2,7 @@
 //  AllPostsView.swift
 //  conectivity
 //
-//  Created by Dilip on 2024-10-27.
+//  Created by Santhos on 2024-10-27.
 //
 
 import SwiftUI
@@ -151,4 +151,3 @@ struct AllPostsView: View {
         }
     }
 }
-
