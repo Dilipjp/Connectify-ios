@@ -78,14 +78,23 @@ struct HomeScreen: View {
                             
                             // Display Post Location Name with Icon
                            
+
+                            if let locationName = posts[index].locationName, !locationName.isEmpty {
                                 HStack {
                                     Image(systemName: "mappin.and.ellipse") // Location icon
                                         .foregroundColor(.red)
-                                    Text(posts[index].locationName)
+                                    Text(locationName)
+
                                         .font(.subheadline)
                                         .foregroundColor(.gray)
                                 }
                                 .padding(.horizontal, 10)
+
+                            }
+
+
+
+
 
                             // Like, Comment, Share Icons with Count
                             HStack {
@@ -188,6 +197,7 @@ struct HomeScreen: View {
                    let locationName = dict["locationName"] as? String,
                    
                    let timestamp = dict["timestamp"] as? Double {
+                    let locationName = dict["locationName"] as? String
 
                     let likeCount = dict["likeCount"] as? Int ?? 0
                     let commentCount = dict["commentCount"] as? Int ?? 0
@@ -195,7 +205,18 @@ struct HomeScreen: View {
                     let likesDict = dict["likes"] as? [String: Bool] ?? [:]
                     let likedByCurrentUser = likesDict[currentUserId!] ?? false
 
-                    let post = Post(postId: postId, userId: userId, postImageUrl: postImageUrl,locationName: locationName, caption: caption, likeCount: likeCount, commentCount: commentCount, timestamp: timestamp, likedByCurrentUser: likedByCurrentUser)
+                    let post = Post(
+                        postId: postId,
+                        userId: userId,
+                        postImageUrl: postImageUrl,
+                        locationName: locationName,
+                        caption: caption,
+                        likeCount: likeCount,
+                        commentCount: commentCount,
+                        timestamp: timestamp,
+                        likedByCurrentUser: likedByCurrentUser
+                    )
+
                     
                     newPosts.append(post)
                 }
@@ -206,6 +227,7 @@ struct HomeScreen: View {
             fetchUserDetails(for: self.posts)
         }
     }
+
 
     func fetchUserDetails(for posts: [Post]) {
         for (index, post) in posts.enumerated() {
@@ -292,15 +314,17 @@ struct Post: Identifiable {
     let postId: String
     let userId: String
     let postImageUrl: String
-    let locationName: String
+
+    var locationName: String?
+
     let caption: String
     var likeCount: Int
     let commentCount: Int
     let timestamp: TimeInterval
     var likedByCurrentUser: Bool = false
     var isLikeButtonDisabled: Bool = false
-    var userData: UserData?  // Optional to store user data
-    var comments: [Comment] = []  // Add comments here
+    var userData: UserData?
+    var comments: [Comment] = []  
 }
 
 struct Comment: Identifiable {

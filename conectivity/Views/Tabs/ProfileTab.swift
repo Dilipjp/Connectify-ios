@@ -15,6 +15,8 @@ struct ProfileScreen: View {
     @State private var isEditing = false
     @State private var isLoading = false
     @State private var successMessage: String? = nil
+    @State private var userRole: String = ""
+    @State private var userRole: String = ""
 
     private var dbRef = Database.database().reference()
 
@@ -112,10 +114,44 @@ struct ProfileScreen: View {
                     .sheet(isPresented: $isEditing) {
                         EditProfileView(username: $username, userBio: $userBio, profileImage: $profileImage, saveAction: saveProfileData, onSuccess: { message in
                             successMessage = message
+                           
                             // Remove success message after 3 seconds
+                            if userRole == "Moderator" {
+                                NavigationLink(destination: AllPostsView()) {
+                                    Text("All Posts")
+                                        .font(.headline)
+                                        .padding()
+                                        .frame(maxWidth: .infinity)
+                                        .background(Color.black)
+                                        .foregroundColor(.white)
+                                        .cornerRadius(10)
+                                }
+                            } else if userRole == "Admin" {
+                                NavigationLink(destination: AllUsersView()) {
+                                    Text("All Users")
+                                        .font(.headline)
+                                        .padding()
+                                        .frame(maxWidth: .infinity)
+                                        .background(Color.black)
+                                        .foregroundColor(.white)
+                                        .cornerRadius(10)
+                                }
+                            }
+                            
                             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                                 successMessage = nil
                             }
+                            if userRole == "Moderator" {
+                                    NavigationLink(destination: AllPostsView()) { // Link to AllPostsView
+                                        Text("All Posts")
+                                            .font(.headline)
+                                            .padding()
+                                            .frame(maxWidth: .infinity)
+                                            .background(Color.black)
+                                            .foregroundColor(.white)
+                                            .cornerRadius(10                                 )
+                                                                        }
+                                                                    }
                         })
                     }
                     

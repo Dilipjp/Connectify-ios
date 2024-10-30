@@ -1,9 +1,3 @@
-//
-//  PostTab.swift
-//  conectivity
-//
-//  Created by Dilip on 2024-09-29.
-//
 import SwiftUI
 import Firebase
 import FirebaseStorage
@@ -169,9 +163,4 @@ struct PostScreen: View {
         }
     }
 }
-
-
-
-
-
 
