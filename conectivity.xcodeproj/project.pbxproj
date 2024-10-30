@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5561D0682CCF036200422EB8 /* AllPostsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5561D0672CCF036200422EB8 /* AllPostsView.swift */; };
-		5FD6708D2CD003E500018605 /* AllUsersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD6708C2CD003E200018605 /* AllUsersView.swift */; };
 		DA7B94A82CBF7D77009C6BBA /* UserPostsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7B94A72CBF7D77009C6BBA /* UserPostsView.swift */; };
 		DA7B94AA2CBF8BA5009C6BBA /* EditPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7B94A92CBF8BA5009C6BBA /* EditPostView.swift */; };
 		DA7B94AC2CC0D022009C6BBA /* CommentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7B94AB2CC0D022009C6BBA /* CommentView.swift */; };
@@ -29,6 +27,9 @@
 		DA7ED58F2CAA0477008C91D8 /* FollowersTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7ED58E2CAA0477008C91D8 /* FollowersTab.swift */; };
 		DA7ED5912CAA0C2A008C91D8 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7ED5902CAA0C2A008C91D8 /* ImagePicker.swift */; };
 		DA7ED5932CAA2356008C91D8 /* EditProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7ED5922CAA2356008C91D8 /* EditProfileView.swift */; };
+		DAACD88A2CD275F800FA16F3 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DAACD8892CD275F800FA16F3 /* GoogleService-Info.plist */; };
+		DAACD88C2CD27D9000FA16F3 /* AllPostsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAACD88B2CD27D9000FA16F3 /* AllPostsView.swift */; };
+		DAACD88E2CD27DD800FA16F3 /* AllUsersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAACD88D2CD27DD800FA16F3 /* AllUsersView.swift */; };
 		DAC7C7062C995A640032853B /* conectivityApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC7C7052C995A640032853B /* conectivityApp.swift */; };
 		DAC7C7082C995A640032853B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC7C7072C995A640032853B /* ContentView.swift */; };
 		DAC7C70A2C995A650032853B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAC7C7092C995A650032853B /* Assets.xcassets */; };
@@ -56,8 +57,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		5561D0672CCF036200422EB8 /* AllPostsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllPostsView.swift; sourceTree = "<group>"; };
-		5FD6708C2CD003E200018605 /* AllUsersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllUsersView.swift; sourceTree = "<group>"; };
 		DA7B94A72CBF7D77009C6BBA /* UserPostsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPostsView.swift; sourceTree = "<group>"; };
 		DA7B94A92CBF8BA5009C6BBA /* EditPostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPostView.swift; sourceTree = "<group>"; };
 		DA7B94AB2CC0D022009C6BBA /* CommentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentView.swift; sourceTree = "<group>"; };
@@ -74,6 +73,9 @@
 		DA7ED58E2CAA0477008C91D8 /* FollowersTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowersTab.swift; sourceTree = "<group>"; };
 		DA7ED5902CAA0C2A008C91D8 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		DA7ED5922CAA2356008C91D8 /* EditProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileView.swift; sourceTree = "<group>"; };
+		DAACD8892CD275F800FA16F3 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		DAACD88B2CD27D9000FA16F3 /* AllPostsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllPostsView.swift; sourceTree = "<group>"; };
+		DAACD88D2CD27DD800FA16F3 /* AllUsersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllUsersView.swift; sourceTree = "<group>"; };
 		DAC7C7022C995A640032853B /* conectivity.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = conectivity.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAC7C7052C995A640032853B /* conectivityApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = conectivityApp.swift; sourceTree = "<group>"; };
 		DAC7C7072C995A640032853B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -119,7 +121,6 @@
 		DA7ED5662CA9F281008C91D8 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				5FD6708C2CD003E200018605 /* AllUsersView.swift */,
 				DA7ED5852CAA01F7008C91D8 /* Tabs */,
 				DA7ED5792CA9F9D4008C91D8 /* SplashView.swift */,
 				DA7ED57B2CA9F9FF008C91D8 /* SignInView.swift */,
@@ -131,6 +132,8 @@
 				DA7B94A92CBF8BA5009C6BBA /* EditPostView.swift */,
 				DA7B94AB2CC0D022009C6BBA /* CommentView.swift */,
 				DA7B94AD2CC0E6CE009C6BBA /* LocationSearchView.swift */,
+				DAACD88B2CD27D9000FA16F3 /* AllPostsView.swift */,
+				DAACD88D2CD27DD800FA16F3 /* AllUsersView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -158,7 +161,6 @@
 				DA7ED58A2CAA042C008C91D8 /* ProfileTab.swift */,
 				DA7ED58C2CAA0450008C91D8 /* PostTab.swift */,
 				DA7ED58E2CAA0477008C91D8 /* FollowersTab.swift */,
-				5561D0672CCF036200422EB8 /* AllPostsView.swift */,
 			);
 			path = Tabs;
 			sourceTree = "<group>";
@@ -194,6 +196,7 @@
 				DAC7C7092C995A650032853B /* Assets.xcassets */,
 				DAC7C70B2C995A650032853B /* conectivity.entitlements */,
 				DAC7C70C2C995A660032853B /* Preview Content */,
+				DAACD8892CD275F800FA16F3 /* GoogleService-Info.plist */,
 			);
 			path = conectivity;
 			sourceTree = "<group>";
@@ -338,6 +341,7 @@
 			files = (
 				DAC7C70E2C995A660032853B /* Preview Assets.xcassets in Resources */,
 				DAC7C70A2C995A650032853B /* Assets.xcassets in Resources */,
+				DAACD88A2CD275F800FA16F3 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -365,7 +369,7 @@
 				DA7ED5932CAA2356008C91D8 /* EditProfileView.swift in Sources */,
 				DA7B94AC2CC0D022009C6BBA /* CommentView.swift in Sources */,
 				DA7ED5912CAA0C2A008C91D8 /* ImagePicker.swift in Sources */,
-				5FD6708D2CD003E500018605 /* AllUsersView.swift in Sources */,
+				DAACD88E2CD27DD800FA16F3 /* AllUsersView.swift in Sources */,
 				DAC7C7082C995A640032853B /* ContentView.swift in Sources */,
 				DA7ED58D2CAA0450008C91D8 /* PostTab.swift in Sources */,
 				DA7B94AA2CBF8BA5009C6BBA /* EditPostView.swift in Sources */,
@@ -376,7 +380,7 @@
 				DA7ED58F2CAA0477008C91D8 /* FollowersTab.swift in Sources */,
 				DAC7C7062C995A640032853B /* conectivityApp.swift in Sources */,
 				DA7ED5822CA9FA5E008C91D8 /* HomeView.swift in Sources */,
-				5561D0682CCF036200422EB8 /* AllPostsView.swift in Sources */,
+				DAACD88C2CD27D9000FA16F3 /* AllPostsView.swift in Sources */,
 				DA7ED58B2CAA042C008C91D8 /* ProfileTab.swift in Sources */,
 				DA7ED5872CAA0209008C91D8 /* HomeTab.swift in Sources */,
 				DA7ED57E2CA9FA23008C91D8 /* SignUpView.swift in Sources */,
