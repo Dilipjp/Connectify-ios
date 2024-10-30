@@ -3,7 +3,7 @@ import SwiftUI
 struct HomeView: View {
     var body: some View {
         TabView {
-            HomeScreen()  // Use the renamed HomeScreen
+            HomeScreen()
                 .tabItem {
                     Label("Home", systemImage: "house.fill")
                 }
@@ -13,7 +13,7 @@ struct HomeView: View {
                     Label("Followers", systemImage: "person.2.fill")
                 }
 
-            PostScreen(postId: "samplePostId", userId: "sampleUserId", username: "sampleUsername")  // Pass actual data
+            PostScreen()  // Pass actual data
                 .tabItem {
                     Label("Post", systemImage: "plus.circle.fill")
                 }
