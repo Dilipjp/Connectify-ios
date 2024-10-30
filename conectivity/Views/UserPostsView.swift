@@ -2,8 +2,12 @@
 //  UserPostsView.swift
 //  conectivity
 //
-//  Created by Dilip on 2024-10-16.
+
+//  Created by Subash Gaddam on 2024-10-17.
 //
+
+
+
 import SwiftUI
 import Firebase
 import FirebaseAuth
@@ -14,6 +18,7 @@ struct UserPostsView: View {
     @State private var isLoading = true
     @State private var selectedPost: Post? = nil // For navigation
     @State private var showEditPostView = false // To trigger sheet for editing post
+
     private var dbRef = Database.database().reference()
 
     var body: some View {
@@ -27,12 +32,14 @@ struct UserPostsView: View {
             } else {
                 List {
                     ForEach(userPosts, id: \.postId) { post in
+
                         VStack(alignment: .leading, spacing: 15) {
                             // Post Caption
                             Text(post.caption)
                                 .font(.headline)
                             
                             // Display Post Image
+
                             if let url = URL(string: post.postImageUrl) {
                                 AsyncImage(url: url) { image in
                                     image
@@ -40,10 +47,12 @@ struct UserPostsView: View {
                                         .scaledToFit()
                                         .frame(maxHeight: 250) // Limit image height
                                         .cornerRadius(8)
+
                                 } placeholder: {
                                     ProgressView()
                                 }
                             }
+
                             
                             // HStack for Edit and Delete buttons
                             HStack {
@@ -78,6 +87,7 @@ struct UserPostsView: View {
                             .padding(.top, 10)
                         }
                         .padding(.vertical, 8) // Padding between posts
+
                     }
                 }
             }
@@ -94,6 +104,7 @@ struct UserPostsView: View {
 
 
     // Fetch posts belonging to the current user
+
     func fetchUserPosts() {
         guard let user = Auth.auth().currentUser else { return }
 
@@ -112,6 +123,7 @@ struct UserPostsView: View {
                             let postImageUrl = value["postImageUrl"] as? String ?? ""
                             let locationName = value["locationName"] as? String ?? ""
 
+
                             let post = Post(
                                 postId: postId,
                                 userId: user.uid,
@@ -125,6 +137,7 @@ struct UserPostsView: View {
                                 isLikeButtonDisabled: false,
                                 userData: nil,
                                 comments: []
+
                             )
                             fetchedPosts.append(post)
                         }
@@ -137,10 +150,10 @@ struct UserPostsView: View {
                 }
             }
     }
-
     // Delete post
     func deletePost(postId: String) {
         print("Error deleting post:")
+
         dbRef.child("posts").child(postId).removeValue { error, _ in
             if let error = error {
                 print("Error deleting post: \(error.localizedDescription)")
@@ -150,6 +163,7 @@ struct UserPostsView: View {
         }
     }
 }
+
 
 
 

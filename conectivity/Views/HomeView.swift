@@ -1,10 +1,3 @@
-//
-//  HomeView.swift
-//  conectivity
-//
-//  Created by Dilip on 2024-09-29.
-//
-
 import SwiftUI
 
 struct HomeView: View {
@@ -20,7 +13,7 @@ struct HomeView: View {
                     Label("Followers", systemImage: "person.2.fill")
                 }
 
-            PostScreen()  // Use the renamed PostScreen
+            PostScreen(postId: "samplePostId", userId: "sampleUserId", username: "sampleUsername")  // Pass actual data
                 .tabItem {
                     Label("Post", systemImage: "plus.circle.fill")
                 }
@@ -38,6 +31,3 @@ struct HomeView_Previews: PreviewProvider {
         HomeView()
     }
 }
-
-
-
