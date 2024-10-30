@@ -145,28 +145,28 @@ struct ProfileScreen: View {
 //                                                                    }
                         })
                     }
-                    // Conditional Navigation Buttons
-//                                    if userRole == "Moderator" {
-//                                        NavigationLink(destination: AllPostsView()) {
-//                                            Text("All Posts")
-//                                                .font(.headline)
-//                                                .padding()
-//                                                .frame(maxWidth: .infinity)
-//                                                .background(Color.black)
-//                                                .foregroundColor(.white)
-//                                                .cornerRadius(10)
-//                                        }
-//                                    } else if userRole == "Admin" {
-//                                        NavigationLink(destination: AllUsersView()) {
-//                                            Text("All Users")
-//                                                .font(.headline)
-//                                                .padding()
-//                                                .frame(maxWidth: .infinity)
-//                                                .background(Color.black)
-//                                                .foregroundColor(.white)
-//                                                .cornerRadius(10)
-//                                        }
-//                                    }
+//                     Conditional Navigation Buttons
+                                    if userRole == "moderator" {
+                                        NavigationLink(destination: AllPostsView()) {
+                                            Text("All Posts")
+                                                .font(.headline)
+                                                .padding()
+                                                .frame(maxWidth: .infinity)
+                                                .background(Color.black)
+                                                .foregroundColor(.white)
+                                                .cornerRadius(10)
+                                        }
+                                    } else if userRole == "admin" {
+                                        NavigationLink(destination: AllUsersView()) {
+                                            Text("All Users")
+                                                .font(.headline)
+                                                .padding()
+                                                .frame(maxWidth: .infinity)
+                                                .background(Color.black)
+                                                .foregroundColor(.white)
+                                                .cornerRadius(10)
+                                        }
+                                    }
                     
                     // Success message
                     if let successMessage = successMessage {
