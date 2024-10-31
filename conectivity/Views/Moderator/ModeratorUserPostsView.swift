@@ -131,3 +131,44 @@ public struct ModeratorUserPostsView: View {
                                   }
                               }
 
+    private func fetchUserPosts() {
+            dbRef.child("posts")
+                .queryOrdered(byChild: "userId")
+                .queryEqual(toValue: userId)
+                .observe(.value) { (snapshot: DataSnapshot) in
+                    var fetchedPosts: [Post] = []
+
+                    if snapshot.exists() && snapshot.hasChildren() {
+                        for child in snapshot.children {
+                            if let snap = child as? DataSnapshot,
+                               let value = snap.value as? [String: Any] {
+                                let postId = snap.key
+                                let caption = value["caption"] as? String ?? ""
+                                let postImageUrl = value["postImageUrl"] as? String ?? ""
+                                let locationName = value["locationName"] as? String ?? ""
+
+                                let post = Post(
+                                    postId: postId,
+                                    userId: userId,
+                                    postImageUrl: postImageUrl,
+                                    locationName: locationName,
+                                    caption: caption,
+                                    likeCount: 0,
+                                    commentCount: 0,
+                                    timestamp: Date().timeIntervalSince1970,
+                                    likedByCurrentUser: false,
+                                    isLikeButtonDisabled: false,
+                                    userData: nil,
+                                    comments: []
+                                )
+                                fetchedPosts.append(post)
+                            }
+                        }
+                    }
+
+                    DispatchQueue.main.async {
+                        self.userPosts = fetchedPosts
+                        self.isLoading = false
+                    }
+                }
+        }
