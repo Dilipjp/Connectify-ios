@@ -272,6 +272,28 @@ struct CommentView: View {
             self.isLoading = false
         }
     }
+    
+    
+    // increase commentCount in the posts node
+    func increaseCommentCount() {
+        let postRef = Database.database().reference().child("posts").child(postId)
+        
+        postRef.runTransactionBlock { currentData -> TransactionResult in
+            if var post = currentData.value as? [String: Any],
+               let commentCount = post["commentCount"] as? Int {
+                post["commentCount"] = commentCount + 1
+                currentData.value = post
+                return .success(withValue: currentData)
+            }
+            return .success(withValue: currentData)
+        } andCompletionBlock: { error, _, _ in
+            if let error = error {
+                print("Error updating comment count: \(error)")
+            } else {
+                print("Comment count updated successfully.")
+            }
+        }
+    }
 
     // Fetch user details
     func fetchUserDetails(for userId: String, completion: @escaping (String?, String?) -> Void) {
