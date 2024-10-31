@@ -294,6 +294,21 @@ struct CommentView: View {
             }
         }
     }
+    
+    
+    // decrease commentCount in the posts node
+    func decreaseCommentCount() {
+        let ref = Database.database().reference().child("posts").child(postId).child("commentCount")
+        let newCommentCount = self.comments.count
+        ref.setValue(newCommentCount) { error, _ in
+            if let error = error {
+                print("Error updating comment count: \(error)")
+            } else {
+                print("Comment count updated successfully")
+            }
+        }
+    }
+
 
     // Fetch user details
     func fetchUserDetails(for userId: String, completion: @escaping (String?, String?) -> Void) {
