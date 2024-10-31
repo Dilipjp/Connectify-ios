@@ -177,3 +177,12 @@ public struct ModeratorUserPostsView: View {
              userPosts[index] = updatedPost
          }
      }
+    private func deletePost(postId: String) {
+           dbRef.child("posts").child(postId).removeValue { error, _ in
+               if let error = error {
+                   print("Error deleting post: \(error.localizedDescription)")
+               } else {
+                   fetchUserPosts() // Refresh the posts after deletion
+               }
+           }
+       }
