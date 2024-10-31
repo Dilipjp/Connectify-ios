@@ -172,3 +172,8 @@ public struct ModeratorUserPostsView: View {
                     }
                 }
         }
+    private func updatePostInList(_ updatedPost: Post) {
+         if let index = userPosts.firstIndex(where: { $0.postId == updatedPost.postId }) {
+             userPosts[index] = updatedPost
+         }
+     }
