@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		55D4F53C2CD33C3E00B1023D /* ModeratorUsersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D4F53B2CD33C3E00B1023D /* ModeratorUsersView.swift */; };
 		DA7B94A82CBF7D77009C6BBA /* UserPostsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7B94A72CBF7D77009C6BBA /* UserPostsView.swift */; };
 		DA7B94AA2CBF8BA5009C6BBA /* EditPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7B94A92CBF8BA5009C6BBA /* EditPostView.swift */; };
 		DA7B94AC2CC0D022009C6BBA /* CommentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7B94AB2CC0D022009C6BBA /* CommentView.swift */; };
@@ -57,6 +58,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		55D4F53B2CD33C3E00B1023D /* ModeratorUsersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeratorUsersView.swift; sourceTree = "<group>"; };
 		DA7B94A72CBF7D77009C6BBA /* UserPostsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPostsView.swift; sourceTree = "<group>"; };
 		DA7B94A92CBF8BA5009C6BBA /* EditPostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPostView.swift; sourceTree = "<group>"; };
 		DA7B94AB2CC0D022009C6BBA /* CommentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentView.swift; sourceTree = "<group>"; };
@@ -118,9 +120,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		55D4F53A2CD33C0F00B1023D /* Moderator */ = {
+			isa = PBXGroup;
+			children = (
+				55D4F53B2CD33C3E00B1023D /* ModeratorUsersView.swift */,
+			);
+			path = Moderator;
+			sourceTree = "<group>";
+		};
 		DA7ED5662CA9F281008C91D8 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				55D4F53A2CD33C0F00B1023D /* Moderator */,
 				DA7ED5852CAA01F7008C91D8 /* Tabs */,
 				DA7ED5792CA9F9D4008C91D8 /* SplashView.swift */,
 				DA7ED57B2CA9F9FF008C91D8 /* SignInView.swift */,
@@ -384,6 +395,7 @@
 				DA7ED58B2CAA042C008C91D8 /* ProfileTab.swift in Sources */,
 				DA7ED5872CAA0209008C91D8 /* HomeTab.swift in Sources */,
 				DA7ED57E2CA9FA23008C91D8 /* SignUpView.swift in Sources */,
+				55D4F53C2CD33C3E00B1023D /* ModeratorUsersView.swift in Sources */,
 				DA7ED57C2CA9F9FF008C91D8 /* SignInView.swift in Sources */,
 				DA7B94A82CBF7D77009C6BBA /* UserPostsView.swift in Sources */,
 			);
