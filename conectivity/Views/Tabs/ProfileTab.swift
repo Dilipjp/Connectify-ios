@@ -107,46 +107,15 @@ struct ProfileScreen: View {
                             successMessage = message
                            
                             // Remove success message after 3 seconds
-//                            if userRole == "Moderator" {
-//                                NavigationLink(destination: AllPostsView()) {
-//                                    Text("All Posts")
-//                                        .font(.headline)
-//                                        .padding()
-//                                        .frame(maxWidth: .infinity)
-//                                        .background(Color.black)
-//                                        .foregroundColor(.white)
-//                                        .cornerRadius(10)
-//                                }
-//                            } else if userRole == "Admin" {
-////                                NavigationLink(destination: AllUsersView()) {
-////                                    Text("All Users")
-////                                        .font(.headline)
-////                                        .padding()
-////                                        .frame(maxWidth: .infinity)
-////                                        .background(Color.black)
-////                                        .foregroundColor(.white)
-////                                        .cornerRadius(10)
-////                                }
-//                            }
                             
                             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                                 successMessage = nil
                             }
-//                            if userRole == "Moderator" {
-//                                    NavigationLink(destination: AllPostsView()) { // Link to AllPostsView
-//                                        Text("All Posts")
-//                                            .font(.headline)
-//                                            .padding()
-//                                            .frame(maxWidth: .infinity)
-//                                            .background(Color.black)
-//                                            .foregroundColor(.white)
-//                                            .cornerRadius(10                                 )
-//                                                                        }
-//                                                                    }
+
                         })
                     }
 //                     Conditional Navigation Buttons
-                                    if userRole == "moderator" {
+                                    if userRole == "Moderator" {
                                         NavigationLink(destination: AllPostsView()) {
                                             Text("All Posts")
                                                 .font(.headline)
@@ -156,7 +125,7 @@ struct ProfileScreen: View {
                                                 .foregroundColor(.white)
                                                 .cornerRadius(10)
                                         }
-                                    } else if userRole == "admin" {
+                                    } else if userRole == "Admin" {
                                         NavigationLink(destination: AllUsersView()) {
                                             Text("All Users")
                                                 .font(.headline)
@@ -216,7 +185,7 @@ struct ProfileScreen: View {
                         self.username = "Your Awesome Name" // Fallback if no username is found
                     }
                 }
-                self.userRole = value["userRole"] as? String ?? "" 
+                self.userRole = value["userRole"] as? String ?? ""
                 // Fetch the profile image URL
                 if let profileImageUrlString = value["userProfileImage"] as? String,
                    let profileImageUrl = URL(string: profileImageUrlString) {
