@@ -75,7 +75,7 @@ struct EditProfileView: View {
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(isLoading ? Color.gray : Color.blue)
+                        .background(isLoading ? Color.gray : Color.black)
                         .cornerRadius(10)
                 }
                 .disabled(isLoading)
