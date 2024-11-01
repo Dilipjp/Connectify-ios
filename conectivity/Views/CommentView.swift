@@ -156,7 +156,7 @@ struct CommentView: View {
         guard let user = Auth.auth().currentUser else { return }
         isSubmitting = true
         let commentId = UUID().uuidString
-        let timestamp = Date().timeIntervalSince1970 * 1000 // milliseconds
+        let timestamp = Int(Date().timeIntervalSince1970 * 1000) // milliseconds
         
         let newComment = [
             "commentText": newCommentText,
@@ -174,7 +174,7 @@ struct CommentView: View {
                     let comment = Comment1(
                         id: commentId,
                         commentText: newCommentText,
-                        timestamp: timestamp,
+                        timestamp: TimeInterval(timestamp),
                         userId: user.uid,
                         userName: userName,
                         userProfileImage: userProfileImage
@@ -182,14 +182,17 @@ struct CommentView: View {
                     self.comments.append(comment)
                     self.newCommentText = ""
                 }
-//                updateCommentCount()
+                increaseCommentCount()
+
                 
             }
             isSubmitting = false
         }
     }
+   
     
 
+    
 
     // Update an existing comment
     func updateComment(commentId: String) {
@@ -231,6 +234,8 @@ struct CommentView: View {
             } else {
                 // Remove the comment from the local list
                 self.comments.removeAll { $0.id == commentId }
+                decreaseCommentCount()
+
             }
         }
     }
@@ -262,6 +267,40 @@ struct CommentView: View {
                 self.comments = fetchedComments.sorted(by: { $0.timestamp < $1.timestamp })
             }
             self.isLoading = false
+        }
+    }
+    
+    // increase commentCount in the posts node
+    func increaseCommentCount() {
+        let postRef = Database.database().reference().child("posts").child(postId)
+        
+        postRef.runTransactionBlock { currentData -> TransactionResult in
+            if var post = currentData.value as? [String: Any],
+               let commentCount = post["commentCount"] as? Int {
+                post["commentCount"] = commentCount + 1
+                currentData.value = post
+                return .success(withValue: currentData)
+            }
+            return .success(withValue: currentData)
+        } andCompletionBlock: { error, _, _ in
+            if let error = error {
+                print("Error updating comment count: \(error)")
+            } else {
+                print("Comment count updated successfully.")
+            }
+        }
+    }
+    
+    // decrease commentCount in the posts node
+    func decreaseCommentCount() {
+        let ref = Database.database().reference().child("posts").child(postId).child("commentCount")
+        let newCommentCount = self.comments.count
+        ref.setValue(newCommentCount) { error, _ in
+            if let error = error {
+                print("Error updating comment count: \(error)")
+            } else {
+                print("Comment count updated successfully")
+            }
         }
     }
 
