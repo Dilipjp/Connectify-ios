@@ -15,6 +15,8 @@ struct ProfileScreen: View {
     @State private var isEditing = false
     @State private var isLoading = false
     @State private var successMessage: String? = nil
+    @State private var warningMessage: String? = nil
+    @State private var userWarnings: [UserWarning] = []
     @State private var userRole: String = ""
     private var dbRef = Database.database().reference()
 
@@ -59,12 +61,45 @@ struct ProfileScreen: View {
                         .foregroundColor(.gray)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
+                    // Fetch user warnings for regular users
+                    // Warning message based on user role
+                                            if let warningMessage = warningMessage {
+                                                Text(warningMessage)
+                                                    .foregroundColor(.red)
+                                                    .fontWeight(.bold)
+                                            }
+
+                                            // Display user warnings
+                                            ForEach(userWarnings, id: \.id) { warning in
+                                                VStack(alignment: .leading) {
+                                                    Text(warning.message)
+                                                        .font(.subheadline)
+                                                        .foregroundColor(.orange)
+                                                    Text("Post Caption: \(warning.postId)")
+                                                        .font(.footnote)
+                                                        .foregroundColor(.gray)
+                                                    let dateFormatter: DateFormatter = {
+                                                        let formatter = DateFormatter()
+                                                        formatter.dateStyle = .medium // Customize this as needed
+                                                        formatter.timeStyle = .short // Customize this as needed
+                                                        return formatter
+                                                    }()
+                                                    let date = Date(timeIntervalSince1970: warning.timestamp / 1000.0)
+                                                    Text("Time: \(dateFormatter.string(from: date))")
+                                                        .font(.footnote)
+                                                        .foregroundColor(.gray)
+
+                                                    Divider()
+                                                }
+                                                .padding(.vertical, 5)
+                                            }
                     // Post, Followers, and Following counts in a row
                     HStack(spacing: 30) {
                         NavigationLink(destination: UserPostsView()) {
                                 VStack {
                                     Text("\(postCount)")
                                         .font(.headline)
+                                        .foregroundColor(.black)
                                     Text("Posts")
                                         .font(.subheadline)
                                         .foregroundColor(.gray)
@@ -107,47 +142,16 @@ struct ProfileScreen: View {
                             successMessage = message
                            
                             // Remove success message after 3 seconds
-//                            if userRole == "Moderator" {
-//                                NavigationLink(destination: AllPostsView()) {
-//                                    Text("All Posts")
-//                                        .font(.headline)
-//                                        .padding()
-//                                        .frame(maxWidth: .infinity)
-//                                        .background(Color.black)
-//                                        .foregroundColor(.white)
-//                                        .cornerRadius(10)
-//                                }
-//                            } else if userRole == "Admin" {
-////                                NavigationLink(destination: AllUsersView()) {
-////                                    Text("All Users")
-////                                        .font(.headline)
-////                                        .padding()
-////                                        .frame(maxWidth: .infinity)
-////                                        .background(Color.black)
-////                                        .foregroundColor(.white)
-////                                        .cornerRadius(10)
-////                                }
-//                            }
                             
                             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                                 successMessage = nil
                             }
-//                            if userRole == "Moderator" {
-//                                    NavigationLink(destination: AllPostsView()) { // Link to AllPostsView
-//                                        Text("All Posts")
-//                                            .font(.headline)
-//                                            .padding()
-//                                            .frame(maxWidth: .infinity)
-//                                            .background(Color.black)
-//                                            .foregroundColor(.white)
-//                                            .cornerRadius(10                                 )
-//                                                                        }
-//                                                                    }
+
                         })
                     }
 //                     Conditional Navigation Buttons
-                                    if userRole == "moderator" {
-                                        NavigationLink(destination: AllPostsView()) {
+                                    if userRole == "Moderator" {
+                                        NavigationLink(destination: ModeratorUsersView()) {
                                             Text("All Posts")
                                                 .font(.headline)
                                                 .padding()
@@ -156,8 +160,8 @@ struct ProfileScreen: View {
                                                 .foregroundColor(.white)
                                                 .cornerRadius(10)
                                         }
-                                    } else if userRole == "admin" {
-                                        NavigationLink(destination: AllUsersView()) {
+                                    } else if userRole == "Admin" {
+                                        NavigationLink(destination: AdminUsersView()) {
                                             Text("All Users")
                                                 .font(.headline)
                                                 .padding()
@@ -216,7 +220,18 @@ struct ProfileScreen: View {
                         self.username = "Your Awesome Name" // Fallback if no username is found
                     }
                 }
-                self.userRole = value["userRole"] as? String ?? "" 
+                self.userRole = value["userRole"] as? String ?? ""
+                // Set the user role
+
+                                // Set warning message based on user role
+                                switch self.userRole {
+                                case "Moderator":
+                                    self.warningMessage = "You are a Moderator!."
+                                case "Admin":
+                                    self.warningMessage = "You are an Admin!."
+                                default:
+                                    self.warningMessage = nil // Clear the warning message for regular users
+                                }
                 // Fetch the profile image URL
                 if let profileImageUrlString = value["userProfileImage"] as? String,
                    let profileImageUrl = URL(string: profileImageUrlString) {
@@ -236,6 +251,10 @@ struct ProfileScreen: View {
                         self.userBio = fetchedBio
                     }
                 }
+                // Fetch user warnings for regular users
+                               if self.userRole == "User" {
+                                   self.fetchUserWarnings(userId: user.uid)
+                               }
             } else {
                 DispatchQueue.main.async {
                     // Handle case where user data is not found
@@ -245,6 +264,69 @@ struct ProfileScreen: View {
             }
         }
     }
+    
+    // Model for user warning
+    struct UserWarning: Identifiable {
+        let id: String
+        let message: String
+        let postId: String
+        let timestamp: Double
+    }
+
+    
+    func fetchUserWarnings(userId: String) {
+        dbRef.child("users").child(userId).child("userWarnings").observeSingleEvent(of: .value) { snapshot in
+            // Check if snapshot contains data
+            if let warningsData = snapshot.value as? [String: Any] {
+                var warnings: [UserWarning] = []
+
+                let dispatchGroup = DispatchGroup() // Create a DispatchGroup to manage async tasks
+
+                for (key, value) in warningsData {
+                    if let warningDict = value as? [String: Any],
+                       let message = warningDict["message"] as? String,
+                       let postId = warningDict["postId"] as? String,
+                       let timestamp = warningDict["timestamp"] as? Double {
+
+                        dispatchGroup.enter() // Enter the group for each postId fetch
+
+                        // Fetch the post caption using the postId
+                        self.dbRef.child("posts").child(postId).observeSingleEvent(of: .value) { postSnapshot in
+                            if let postData = postSnapshot.value as? [String: Any],
+                               let caption = postData["caption"] as? String {
+                                // Create the UserWarning with the caption included
+                                let userWarning = UserWarning(id: key, message: "\(message)", postId: caption, timestamp: timestamp)
+                                warnings.append(userWarning)
+                            } else {
+                                // If post data is not found, create a warning without the caption
+                                let userWarning = UserWarning(id: key, message: message, postId: postId, timestamp: timestamp)
+                                warnings.append(userWarning)
+                            }
+
+                            dispatchGroup.leave() // Leave the group after the fetch
+                        }
+                    }
+                }
+
+                // Notify when all async fetches are complete
+                dispatchGroup.notify(queue: .main) {
+                    self.userWarnings = warnings
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.userWarnings = [] // Clear warnings if no data is found
+                }
+            }
+        } withCancel: { error in
+            // Handle potential error
+            print("Error fetching user warnings: \(error.localizedDescription)")
+            DispatchQueue.main.async {
+                self.userWarnings = [] // Clear warnings if there's an error
+            }
+        }
+    }
+
+
     // Fetch post count for the current user from Firebase
         func fetchPostCount() {
             guard let user = Auth.auth().currentUser else { return }
