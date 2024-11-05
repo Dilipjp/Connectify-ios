@@ -128,6 +128,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2A51A1402CDABD2B00CD0BDA /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				55D4F5442CD4A79600B1023D /* AdminUsersView.swift */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		55D4F53A2CD33C0F00B1023D /* Moderator */ = {
 			isa = PBXGroup;
 			children = (
@@ -135,14 +143,6 @@
 				55D4F5412CD3443400B1023D /* ModeratorUserPostsView.swift */,
 			);
 			path = Moderator;
-			sourceTree = "<group>";
-		};
-		55D4F5432CD4A78500B1023D /* Admin */ = {
-			isa = PBXGroup;
-			children = (
-				55D4F5442CD4A79600B1023D /* AdminUsersView.swift */,
-			);
-			path = Admin;
 			sourceTree = "<group>";
 		};
 		DA7ED5662CA9F281008C91D8 /* Views */ = {
@@ -201,6 +201,7 @@
 				DAC7C7162C995A660032853B /* conectivityTests */,
 				DAC7C7202C995A660032853B /* conectivityUITests */,
 				DAC7C7032C995A640032853B /* Products */,
+				2A51A1402CDABD2B00CD0BDA /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
