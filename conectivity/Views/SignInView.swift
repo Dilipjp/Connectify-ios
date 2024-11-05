@@ -44,7 +44,7 @@ struct SignInView: View {
                         NavigationLink(destination: ForgotPasswordView()) {
                             Text("Forgot Password?")
                                 .font(.footnote)
-                                .foregroundColor(.blue)
+                                .foregroundColor(.black)
                         }
                     }
                 }
@@ -69,7 +69,7 @@ struct SignInView: View {
                         .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Color.blue)
+                        .background(Color.black)
                         .cornerRadius(10)
                 }
 
@@ -79,7 +79,7 @@ struct SignInView: View {
                     NavigationLink(destination: SignUpView()) {
                         Text("Sign Up")
                             .fontWeight(.bold)
-                            .foregroundColor(.blue)
+                            .foregroundColor(.black)
                     }
                 }
 
