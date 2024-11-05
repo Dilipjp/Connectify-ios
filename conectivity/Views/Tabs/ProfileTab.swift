@@ -160,7 +160,8 @@
                                                     .foregroundColor(.white)
                                                     .cornerRadius(10)
                                             }
-                                        } else if userRole == "Admin" {
+                                        }
+                                        else if userRole == "Admin" {
                                             NavigationLink(destination: AdminUsersView()) {
                                                 Text("All Users")
                                                     .font(.headline)
