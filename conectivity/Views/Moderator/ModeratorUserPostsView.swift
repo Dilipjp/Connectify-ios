@@ -148,6 +148,7 @@ public struct ModeratorUserPostsView: View {
                 secondaryButton: .cancel()
             )
         }
+        .navigationBarBackButtonHidden(true)
     }
 
     // Fetch posts belonging to the specified user
