@@ -5,6 +5,9 @@
 //  Created by Subash Gaddam on 2024-11-05.
 //
 
+import SwiftUI
+import FirebaseDatabase
+
 struct Report: Identifiable {
     var id: String
     var postId: String
@@ -101,6 +104,27 @@ struct ReportsView: View {
                                               if let userData = userSnapshot.value as? [String: Any],
                                                  let uploaderName = userData["userName"] as? String {
                                                   report.uploaderName = uploaderName
+                                                  dbRef.child("users").child(reporterId).observeSingleEvent(of: .value) { reporterSnapshot in
+                                                      if let reporterData = reporterSnapshot.value as? [String: Any],
+                                                         let reporterName = reporterData["userName"] as? String {
+                                                          report.reporterName = reporterName
+                                                          
+                                                          // Update the report in the array
+                                                          DispatchQueue.main.async {
+                                                              tempReports.append(report)
+                                                              self.reports = tempReports.sorted { $0.timestamp > $1.timestamp }
+                                                          }
+                                                      }
+                                                  }
+                                              }
+                                          }
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }
                                                   
     
 #Preview {
