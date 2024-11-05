@@ -75,6 +75,33 @@ struct ReportsView: View {
                    print("No data found in 'reports' node.")
                    return
                }
+               var tempReports: [Report] = []
+                          
+                          for (reportId, reportValue) in reportsData {
+                              if let reportDict = reportValue as? [String: Any],
+                                 let postId = reportDict["postId"] as? String,
+                                 let reason = reportDict["reason"] as? String,
+                                 let timestamp = reportDict["timestamp"] as? TimeInterval,
+                                 let reporterId = reportDict["userId"] as? String {
+                                  
+                                  var report = Report(id: reportId, postId: postId, reason: reason, timestamp: timestamp, reporterId: reporterId)
+                                  
+                                  // Fetch post details including caption, uploader username, and image URL
+                                  dbRef.child("posts").child(postId).observeSingleEvent(of: .value) { postSnapshot in
+                                      if let postData = postSnapshot.value as? [String: Any],
+                                         let caption = postData["caption"] as? String,
+                                         let uploaderId = postData["userId"] as? String,
+                                         let postImageUrl = postData["postImageUrl"] as? String {
+                                          
+                                          report.caption = caption
+                                          report.postImageUrl = postImageUrl
+                                          
+                                          // Fetch uploader's username
+                                          dbRef.child("users").child(uploaderId).observeSingleEvent(of: .value) { userSnapshot in
+                                              if let userData = userSnapshot.value as? [String: Any],
+                                                 let uploaderName = userData["userName"] as? String {
+                                                  report.uploaderName = uploaderName
+                                                  
     
 #Preview {
     ReportsView()
