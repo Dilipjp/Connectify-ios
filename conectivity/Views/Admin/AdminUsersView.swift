@@ -2,8 +2,7 @@
 //  AdminUsersView.swift
 //  conectivity
 //
-//  Created by suhas guturi on 2024-11-01.
-//
+
 
 import SwiftUI
 import FirebaseDatabase
@@ -114,7 +113,7 @@ struct AdminUsersView: View {
         }
     }
 
-   
+ 
 }
 
 #Preview {
