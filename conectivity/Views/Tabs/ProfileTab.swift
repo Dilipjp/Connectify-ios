@@ -169,7 +169,7 @@ struct ProfileScreen: View {
                                                 .background(Color.black)
                                                 .foregroundColor(.white)
                                                 .cornerRadius(10)
-                                                       }
+                                        }
                                     }
                     
                     // Success message
