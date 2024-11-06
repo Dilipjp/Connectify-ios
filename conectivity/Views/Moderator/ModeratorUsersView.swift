@@ -1,11 +1,11 @@
 
+
 //
 //  ModeratorUsersView.swift
 //  conectivity
 //
 //  Created by Santhosh Nallapati on 2024-10-31.
 //
-
 import SwiftUI
 import FirebaseDatabase
 
@@ -21,7 +21,7 @@ struct ModeratorUsersView: View {
     @State private var allUsers: [User1] = []
     @State private var showAlert = false
     @State private var selectedUserId: String = ""
-    @State private var alertMessage: String = ""
+
 
     var body: some View {
         NavigationStack {
@@ -30,7 +30,7 @@ struct ModeratorUsersView: View {
                     ForEach(allUsers) { user in
                         VStack {
                             HStack(spacing: 15) {
-                                // User Profile Image with Loading & Error Handling
+
                                 AsyncImage(url: URL(string: user.userProfileImage)) { image in
                                     image
                                         .resizable()
@@ -55,9 +55,13 @@ struct ModeratorUsersView: View {
                                 }
                                 
                                 Spacer()
+
+                                
+                               
                             }
                             
-                            // View Posts Button with NavigationLink
+                            // View Posts Button
+
                             NavigationLink(destination: ModeratorUserPostsView(userId: user.userId)) {
                                 Text("View Posts")
                                     .font(.subheadline)
@@ -83,16 +87,7 @@ struct ModeratorUsersView: View {
                 .padding(.horizontal)
             }
             .navigationTitle("All Users")
-            .alert(isPresented: $showAlert) {
-                Alert(
-                    title: Text("Warning"),
-                    message: Text(alertMessage),
-                    primaryButton: .default(Text("Yes"), action: {
-                        sendWarning(to: selectedUserId)
-                    }),
-                    secondaryButton: .cancel()
-                )
-            }
+
             .onAppear(perform: loadAllUsers)
         }
     }
@@ -125,10 +120,12 @@ struct ModeratorUsersView: View {
         }
     }
 
-    private func sendWarning(to userId: String) {
-        print("Sending warning to user: \(userId)")
-    }
+
+   
 }
+
+
+
 
 
 

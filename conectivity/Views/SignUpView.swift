@@ -70,7 +70,7 @@ struct SignUpView: View {
                 showImagePicker = true
             }) {
                 Text("Select Profile Image")
-                    .foregroundColor(.blue)
+                    .foregroundColor(.black)
                     .padding()
                     .background(Color(.systemGray6))
                     .cornerRadius(8)
@@ -108,7 +108,7 @@ struct SignUpView: View {
                         .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Color.blue)
+                        .background(Color.black)
                         .cornerRadius(10)
                 }
             }
@@ -122,7 +122,7 @@ struct SignUpView: View {
                 NavigationLink(destination: SignInView()) {
                     Text("Sign In")
                         .fontWeight(.bold)
-                        .foregroundColor(.blue)
+                        .foregroundColor(.black)
                 }
             }
             .padding(.top, 20)

@@ -156,7 +156,7 @@ struct CommentView: View {
         guard let user = Auth.auth().currentUser else { return }
         isSubmitting = true
         let commentId = UUID().uuidString
-        let timestamp = Date().timeIntervalSince1970 * 1000 // milliseconds
+        let timestamp = Int(Date().timeIntervalSince1970 * 1000) // milliseconds
         
         let newComment = [
             "commentText": newCommentText,
@@ -174,7 +174,7 @@ struct CommentView: View {
                     let comment = Comment1(
                         id: commentId,
                         commentText: newCommentText,
-                        timestamp: timestamp,
+                        timestamp: TimeInterval(timestamp),
                         userId: user.uid,
                         userName: userName,
                         userProfileImage: userProfileImage
@@ -182,21 +182,17 @@ struct CommentView: View {
                     self.comments.append(comment)
                     self.newCommentText = ""
                 }
-//                updateCommentCount()
+                increaseCommentCount()
+
                 
             }
             isSubmitting = false
         }
     }
+   
     
-//    func updateCommentCount(for post: Post) {
-//        let postRef = Database.database().reference().child("posts").child(postId)
-//        postRef.child("commentCount").setValue(post.commentCount + 1) { error, _ in
-//            if let error = error {
-//                print("Error updating comment count: \(error.localizedDescription)")
-//            }
-//        }
-//    }
+
+    
 
     // Update an existing comment
     
@@ -239,6 +235,8 @@ struct CommentView: View {
             } else {
                 // Remove the comment from the local list
                 self.comments.removeAll { $0.id == commentId }
+                decreaseCommentCount()
+
             }
         }
     }
@@ -273,7 +271,8 @@ struct CommentView: View {
         }
     }
     
-    
+
+
     // increase commentCount in the posts node
     func increaseCommentCount() {
         let postRef = Database.database().reference().child("posts").child(postId)
@@ -295,7 +294,7 @@ struct CommentView: View {
         }
     }
     
-    
+
     // decrease commentCount in the posts node
     func decreaseCommentCount() {
         let ref = Database.database().reference().child("posts").child(postId).child("commentCount")
