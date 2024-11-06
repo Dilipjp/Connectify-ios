@@ -195,6 +195,7 @@ struct CommentView: View {
     
 
     // Update an existing comment
+    
     func updateComment(commentId: String) {
         guard let user = Auth.auth().currentUser else { return }
         isSubmitting = true
@@ -270,6 +271,8 @@ struct CommentView: View {
         }
     }
     
+
+
     // increase commentCount in the posts node
     func increaseCommentCount() {
         let postRef = Database.database().reference().child("posts").child(postId)
@@ -291,6 +294,7 @@ struct CommentView: View {
         }
     }
     
+
     // decrease commentCount in the posts node
     func decreaseCommentCount() {
         let ref = Database.database().reference().child("posts").child(postId).child("commentCount")
@@ -303,6 +307,7 @@ struct CommentView: View {
             }
         }
     }
+
 
     // Fetch user details
     func fetchUserDetails(for userId: String, completion: @escaping (String?, String?) -> Void) {

@@ -3,6 +3,7 @@
 //  conectivity
 //
 //  Created by Dilip on 2024-11-05.
+
 //
 
 import SwiftUI
@@ -156,6 +157,7 @@ public struct AdminUserPostsView: View {
             )
         }
         .navigationBarBackButtonHidden(true)
+
     }
 
     // Fetch posts belonging to the specified user

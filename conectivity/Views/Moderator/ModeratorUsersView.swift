@@ -1,3 +1,11 @@
+
+
+//
+//  ModeratorUsersView.swift
+//  conectivity
+//
+//  Created by Santhosh Nallapati on 2024-10-31.
+//
 import SwiftUI
 import FirebaseDatabase
 
@@ -14,6 +22,7 @@ struct ModeratorUsersView: View {
     @State private var showAlert = false
     @State private var selectedUserId: String = ""
 
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -21,6 +30,7 @@ struct ModeratorUsersView: View {
                     ForEach(allUsers) { user in
                         VStack {
                             HStack(spacing: 15) {
+
                                 AsyncImage(url: URL(string: user.userProfileImage)) { image in
                                     image
                                         .resizable()
@@ -45,11 +55,13 @@ struct ModeratorUsersView: View {
                                 }
                                 
                                 Spacer()
+
                                 
                                
                             }
                             
                             // View Posts Button
+
                             NavigationLink(destination: ModeratorUserPostsView(userId: user.userId)) {
                                 Text("View Posts")
                                     .font(.subheadline)
@@ -75,6 +87,7 @@ struct ModeratorUsersView: View {
                 .padding(.horizontal)
             }
             .navigationTitle("All Users")
+
             .onAppear(perform: loadAllUsers)
         }
     }
@@ -107,8 +120,14 @@ struct ModeratorUsersView: View {
         }
     }
 
+
    
 }
+
+
+
+
+
 
 #Preview {
     ModeratorUsersView()

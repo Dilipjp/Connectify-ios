@@ -5,8 +5,10 @@
 //  Created by Dilip on 2024-10-31.
 //
 
+
 import SwiftUI
 import FirebaseDatabase
+
 
 struct User2: Identifiable {
     var id: String { userId }
@@ -21,6 +23,7 @@ struct AdminUsersView: View {
     @State private var showConfirmation = false
     @State private var selectedUser: User2?
     
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -52,6 +55,7 @@ struct AdminUsersView: View {
                                 }
                                 
                                 Spacer()
+
                             }
                             
                             // Row for View Posts and Activate/Deactivate buttons
@@ -96,6 +100,7 @@ struct AdminUsersView: View {
                                 }
                             }
                             .padding(.top, 8)
+
                         }
                         .padding()
                         .background(LinearGradient(
@@ -110,7 +115,9 @@ struct AdminUsersView: View {
                 .padding(.horizontal)
             }
             .navigationTitle("All Users")
+
             .navigationBarBackButtonHidden(true)
+
             .onAppear(perform: loadAllUsers)
         }
     }
@@ -124,7 +131,9 @@ struct AdminUsersView: View {
                 return
             }
             
+
             var tempUsers: [User2] = []
+
             
             for (key, value) in usersData {
                 if let userData = value as? [String: Any],
@@ -134,7 +143,9 @@ struct AdminUsersView: View {
                    let userStatus = userData["userStatus"] as? String,
                    let userProfileImage = userData["userProfileImage"] as? String {
                     
+
                     let user = User2(userId: key, userName: userName, userProfileImage: userProfileImage, userStatus: userStatus)
+
                     tempUsers.append(user)
                 }
             }
@@ -142,7 +153,6 @@ struct AdminUsersView: View {
             self.allUsers = tempUsers
         }
     }
-
     func toggleUserStatus(for user: User2) {
         let dbRef = Database.database().reference().child("users").child(user.userId)
         let newStatus = user.userStatus == "active" ? "deactivated" : "active"
