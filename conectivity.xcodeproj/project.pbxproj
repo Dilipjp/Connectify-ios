@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		55D4F5402CD3435600B1023D /* ModeratorUsersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D4F53F2CD3435600B1023D /* ModeratorUsersView.swift */; };
+		55D4F5422CD3443400B1023D /* ModeratorUserPostsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D4F5412CD3443400B1023D /* ModeratorUserPostsView.swift */; };
+		55D4F5452CD4A79600B1023D /* AdminUsersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D4F5442CD4A79600B1023D /* AdminUsersView.swift */; };
 		DA7B94A82CBF7D77009C6BBA /* UserPostsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7B94A72CBF7D77009C6BBA /* UserPostsView.swift */; };
 		DA7B94AA2CBF8BA5009C6BBA /* EditPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7B94A92CBF8BA5009C6BBA /* EditPostView.swift */; };
 		DA7B94AC2CC0D022009C6BBA /* CommentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7B94AB2CC0D022009C6BBA /* CommentView.swift */; };
@@ -58,6 +61,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		55D4F53F2CD3435600B1023D /* ModeratorUsersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeratorUsersView.swift; sourceTree = "<group>"; };
+		55D4F5412CD3443400B1023D /* ModeratorUserPostsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeratorUserPostsView.swift; sourceTree = "<group>"; };
+		55D4F5442CD4A79600B1023D /* AdminUsersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminUsersView.swift; sourceTree = "<group>"; };
 		DA7B94A72CBF7D77009C6BBA /* UserPostsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPostsView.swift; sourceTree = "<group>"; };
 		DA7B94A92CBF8BA5009C6BBA /* EditPostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPostView.swift; sourceTree = "<group>"; };
 		DA7B94AB2CC0D022009C6BBA /* CommentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentView.swift; sourceTree = "<group>"; };
@@ -94,6 +100,7 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		DAACD88F2CD2E56600FA16F3 /* Moderator */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Moderator; sourceTree = "<group>"; };
 		DAACD8922CD338D500FA16F3 /* Admin */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Admin; sourceTree = "<group>"; };
+
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -125,6 +132,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2A51A1402CDABD2B00CD0BDA /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				55D4F5442CD4A79600B1023D /* AdminUsersView.swift */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+		55D4F53A2CD33C0F00B1023D /* Moderator */ = {
+			isa = PBXGroup;
+			children = (
+				55D4F53F2CD3435600B1023D /* ModeratorUsersView.swift */,
+				55D4F5412CD3443400B1023D /* ModeratorUserPostsView.swift */,
+			);
+			path = Moderator;
+			sourceTree = "<group>";
+		};
 		DA7ED5662CA9F281008C91D8 /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -181,6 +205,7 @@
 				DAC7C7162C995A660032853B /* conectivityTests */,
 				DAC7C7202C995A660032853B /* conectivityUITests */,
 				DAC7C7032C995A640032853B /* Products */,
+				2A51A1402CDABD2B00CD0BDA /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -393,11 +418,14 @@
 				DA7ED5782CA9F96E008C91D8 /* FirebaseService.swift in Sources */,
 				DA7ED58F2CAA0477008C91D8 /* FollowersTab.swift in Sources */,
 				DAC7C7062C995A640032853B /* conectivityApp.swift in Sources */,
+				55D4F5422CD3443400B1023D /* ModeratorUserPostsView.swift in Sources */,
 				DA7ED5822CA9FA5E008C91D8 /* HomeView.swift in Sources */,
 				DAACD88C2CD27D9000FA16F3 /* AllPostsView.swift in Sources */,
 				DA7ED58B2CAA042C008C91D8 /* ProfileTab.swift in Sources */,
+				55D4F5452CD4A79600B1023D /* AdminUsersView.swift in Sources */,
 				DA7ED5872CAA0209008C91D8 /* HomeTab.swift in Sources */,
 				DA7ED57E2CA9FA23008C91D8 /* SignUpView.swift in Sources */,
+				55D4F5402CD3435600B1023D /* ModeratorUsersView.swift in Sources */,
 				DA7ED57C2CA9F9FF008C91D8 /* SignInView.swift in Sources */,
 				DA7B94A82CBF7D77009C6BBA /* UserPostsView.swift in Sources */,
 				DAACD89A2CDABEEC00FA16F3 /* ReportsView.swift in Sources */,

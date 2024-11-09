@@ -147,6 +147,7 @@ struct ProfileScreen: View {
                                 successMessage = nil
                             }
 
+
                         })
                     }
 //                     Conditional Navigation Buttons
@@ -168,6 +169,7 @@ struct ProfileScreen: View {
                                                 .background(Color.black)
                                                 .foregroundColor(.white)
                                                 .cornerRadius(10)
+
                                         }
                                     } else if userRole == "Admin" {
                                         NavigationLink(destination: AdminUsersView()) {

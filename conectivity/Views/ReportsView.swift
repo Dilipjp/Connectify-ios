@@ -2,7 +2,9 @@
 //  ReportsView.swift
 //  conectivity
 //
-//  Created by Dilip on 2024-11-05.
+
+//  Created by Subash Gaddam on 2024-11-05.
+
 //
 
 import SwiftUI
@@ -22,7 +24,6 @@ struct Report: Identifiable {
 
 struct ReportsView: View {
     @State private var reports: [Report] = []
-    
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -132,6 +133,3 @@ struct ReportsView: View {
 #Preview {
     ReportsView()
 }
-
-
-
