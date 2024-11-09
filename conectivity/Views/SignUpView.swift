@@ -29,6 +29,16 @@ struct SignUpView: View {
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .padding(.top, 50)
+            
+//            Image("logo")
+//                .resizable()
+//                .scaledToFit()
+//                .frame(width: 120, height: 120)
+//                .clipShape(Circle())
+//                .overlay(Circle().stroke(Color.gray, lineWidth: 2))
+//                .shadow(radius: 5)
+//                .padding(.bottom, 20)
+
 
             TextField("Email", text: $email)
                 .padding()

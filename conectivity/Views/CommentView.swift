@@ -290,6 +290,14 @@ struct CommentView: View {
             }
         }
     }
+//    func increaseCommentCount(for post: Post) {
+//        let postRef = Database.database().reference().child("posts").child(post.postId)
+//        postRef.child("commentCount").setValue(post.commentCount + 1) { error, _ in
+//            if let error = error {
+//                print("Error updating comment count: \(error.localizedDescription)")
+//            }
+//        }
+//    }
     
     // decrease commentCount in the posts node
     func decreaseCommentCount() {
