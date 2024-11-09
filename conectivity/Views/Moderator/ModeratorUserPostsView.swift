@@ -1,9 +1,11 @@
+
 //
 //  ModeratorUserPostsView.swift
 //  conectivity
 //
 //  Created by Santhosh Nallapati on 2024-10-31.
 //
+
 
 import SwiftUI
 import Firebase
@@ -155,6 +157,8 @@ public struct ModeratorUserPostsView: View {
                 secondaryButton: .cancel()
             )
         }
+        .navigationBarBackButtonHidden(true)
+
     }
 
     // Fetch posts belonging to the specified user
@@ -245,7 +249,9 @@ public struct ModeratorUserPostsView: View {
     private func sendWarning(postId: String) {
         let warningData: [String: Any] = [
             "message": warningMessage,
-            "timestamp": Date().timeIntervalSince1970 * 1000,
+
+            "timestamp": Int(Date().timeIntervalSince1970 * 1000),
+
             "postId": postId
         ]
         
