@@ -29,6 +29,16 @@ struct SignUpView: View {
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .padding(.top, 50)
+            
+//            Image("logo")
+//                .resizable()
+//                .scaledToFit()
+//                .frame(width: 120, height: 120)
+//                .clipShape(Circle())
+//                .overlay(Circle().stroke(Color.gray, lineWidth: 2))
+//                .shadow(radius: 5)
+//                .padding(.bottom, 20)
+
 
             TextField("Email", text: $email)
                 .padding()
@@ -70,7 +80,7 @@ struct SignUpView: View {
                 showImagePicker = true
             }) {
                 Text("Select Profile Image")
-                    .foregroundColor(.blue)
+                    .foregroundColor(.black)
                     .padding()
                     .background(Color(.systemGray6))
                     .cornerRadius(8)
@@ -108,7 +118,7 @@ struct SignUpView: View {
                         .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Color.blue)
+                        .background(Color.black)
                         .cornerRadius(10)
                 }
             }
@@ -122,7 +132,7 @@ struct SignUpView: View {
                 NavigationLink(destination: SignInView()) {
                     Text("Sign In")
                         .fontWeight(.bold)
-                        .foregroundColor(.blue)
+                        .foregroundColor(.black)
                 }
             }
             .padding(.top, 20)

@@ -2,23 +2,27 @@
 //  AdminUsersView.swift
 //  conectivity
 //
+//  Created by Dilip on 2024-10-31.
+//
 
 
 import SwiftUI
 import FirebaseDatabase
 
-//struct User1: Identifiable {
-//    var id: String { userId }
-//    let userId: String
-//    var userName: String
-//    var userProfileImage: String
-//    var userStatus: String
-//}
+
+struct User2: Identifiable {
+    var id: String { userId }
+    let userId: String
+    var userName: String
+    var userProfileImage: String
+    var userStatus: String
+}
 
 struct AdminUsersView: View {
-    @State private var allUsers: [User1] = []
-    @State private var showAlert = false
-    @State private var selectedUserId: String = ""
+    @State private var allUsers: [User2] = []
+    @State private var showConfirmation = false
+    @State private var selectedUser: User2?
+    
 
     var body: some View {
         NavigationStack {
@@ -51,22 +55,52 @@ struct AdminUsersView: View {
                                 }
                                 
                                 Spacer()
-                                
-                               
+
                             }
                             
-                            // View Posts Button
-                            NavigationLink(destination: ModeratorUserPostsView(userId: user.userId)) {
-                                Text("View Posts")
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 8)
-                                    .background(Color.black)
-                                    .cornerRadius(8)
-                                    .padding(.top, 8)
+                            // Row for View Posts and Activate/Deactivate buttons
+                            HStack {
+                                // View Posts Button
+                                NavigationLink(destination: AdminUserPostsView(userId: user.userId)) {
+                                    Text("Posts")
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                        .foregroundColor(.white)
+                                        .padding(.vertical, 8)
+                                        .padding(.horizontal, 12)
+                                        .background(Color.black)
+                                        .cornerRadius(8)
+                                }
+                                
+                                // Toggle User Status Button with Confirmation Alert
+                                Button(action: {
+                                    selectedUser = user
+                                    showConfirmation = true
+                                }) {
+                                    Text(user.userStatus == "active" ? "Deactivate" : "Activate")
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                        .foregroundColor(.white)
+                                        .padding(.vertical, 8)
+                                        .padding(.horizontal, 12)
+                                        .background(user.userStatus == "active" ? Color.red : Color.black)
+                                        .cornerRadius(8)
+                                }
+                                .alert(isPresented: $showConfirmation) {
+                                    Alert(
+                                        title: Text("Confirm Action"),
+                                        message: Text("Are you sure you want to \(selectedUser?.userStatus == "active" ? "deactivate" : "activate") \(selectedUser?.userName ?? "")?"),
+                                        primaryButton: .destructive(Text("Confirm")) {
+                                            if let userToUpdate = selectedUser {
+                                                toggleUserStatus(for: userToUpdate)
+                                            }
+                                        },
+                                        secondaryButton: .cancel()
+                                    )
+                                }
                             }
+                            .padding(.top, 8)
+
                         }
                         .padding()
                         .background(LinearGradient(
@@ -81,6 +115,9 @@ struct AdminUsersView: View {
                 .padding(.horizontal)
             }
             .navigationTitle("All Users")
+
+            .navigationBarBackButtonHidden(true)
+
             .onAppear(perform: loadAllUsers)
         }
     }
@@ -94,7 +131,9 @@ struct AdminUsersView: View {
                 return
             }
             
-            var tempUsers: [User1] = []
+
+            var tempUsers: [User2] = []
+
             
             for (key, value) in usersData {
                 if let userData = value as? [String: Any],
@@ -104,7 +143,9 @@ struct AdminUsersView: View {
                    let userStatus = userData["userStatus"] as? String,
                    let userProfileImage = userData["userProfileImage"] as? String {
                     
-                    let user = User1(userId: key, userName: userName, userProfileImage: userProfileImage, userStatus: userStatus)
+
+                    let user = User2(userId: key, userName: userName, userProfileImage: userProfileImage, userStatus: userStatus)
+
                     tempUsers.append(user)
                 }
             }
@@ -112,10 +153,24 @@ struct AdminUsersView: View {
             self.allUsers = tempUsers
         }
     }
-
- 
+    func toggleUserStatus(for user: User2) {
+        let dbRef = Database.database().reference().child("users").child(user.userId)
+        let newStatus = user.userStatus == "active" ? "deactivated" : "active"
+        
+        dbRef.updateChildValues(["userStatus": newStatus]) { error, _ in
+            if let error = error {
+                print("Error updating status: \(error.localizedDescription)")
+            } else {
+                if let index = self.allUsers.firstIndex(where: { $0.userId == user.userId }) {
+                    self.allUsers[index].userStatus = newStatus
+                }
+                print("User status updated successfully")
+            }
+        }
+    }
 }
 
 #Preview {
     AdminUsersView()
 }
+

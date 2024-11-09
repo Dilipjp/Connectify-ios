@@ -1,18 +1,17 @@
-
 //
-//  ModeratorUserPostsView.swift
+//  AdminUserPostsView.swift
 //  conectivity
 //
-//  Created by Santhosh Nallapati on 2024-10-31.
-//
+//  Created by Dilip on 2024-11-05.
 
+//
 
 import SwiftUI
 import Firebase
 import FirebaseAuth
 import FirebaseDatabase
 
-public struct ModeratorUserPostsView: View {
+public struct AdminUserPostsView: View {
     public let userId: String
 
     @State private var userPosts: [Post] = []
@@ -249,9 +248,7 @@ public struct ModeratorUserPostsView: View {
     private func sendWarning(postId: String) {
         let warningData: [String: Any] = [
             "message": warningMessage,
-
             "timestamp": Int(Date().timeIntervalSince1970 * 1000),
-
             "postId": postId
         ]
         

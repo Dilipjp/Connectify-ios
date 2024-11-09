@@ -64,7 +64,7 @@ struct FollowersScreen: View {
             }
         }
 
-    // Fetch all users and followers
+
     func loadAllUsers() {
         let dbRef = Database.database().reference()
 
@@ -92,6 +92,9 @@ struct FollowersScreen: View {
             }
         }
     }
+
+
+    
 
     // Follow a user
     func followUser(userId: String) {

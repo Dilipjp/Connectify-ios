@@ -148,35 +148,41 @@ struct ProfileScreen: View {
                             }
 
 
-                            })
-                        }
-    //                     Conditional Navigation Buttons
-                                        if userRole == "Moderator" {
-                                            NavigationLink(destination: ModeratorUsersView()) {
-                                                Text("All Posts")
-                                                    .font(.headline)
-                                                    .padding()
-                                                    .frame(maxWidth: .infinity)
-                                                    .background(Color.black)
-                                                    .foregroundColor(.white)
-                                                    .cornerRadius(10)
-                                            }
+                        })
+                    }
+//                     Conditional Navigation Buttons
+                                    if userRole == "Moderator" {
+                                        NavigationLink(destination: ModeratorUsersView()) {
+                                            Text("All Users")
+                                                .font(.headline)
+                                                .padding()
+                                                .frame(maxWidth: .infinity)
+                                                .background(Color.black)
+                                                .foregroundColor(.white)
+                                                .cornerRadius(10)
                                         }
-                                        else if userRole == "Admin" {
-                                            NavigationLink(destination: AdminUsersView()) {
-                                                Text("All Users")
-                                                    .font(.headline)
-                                                    .padding()
-                                                    .frame(maxWidth: .infinity)
-                                                    .background(Color.black)
-                                                    .foregroundColor(.white)
-                                                    .cornerRadius(10)
-                                                           }
+                                        NavigationLink(destination: ReportsView()) {
+                                            Text("All Reports")
+                                                .font(.headline)
+                                                .padding()
+                                                .frame(maxWidth: .infinity)
+                                                .background(Color.black)
+                                                .foregroundColor(.white)
+                                                .cornerRadius(10)
 
                                         }
                                     } else if userRole == "Admin" {
                                         NavigationLink(destination: AdminUsersView()) {
                                             Text("All Users")
+                                                .font(.headline)
+                                                .padding()
+                                                .frame(maxWidth: .infinity)
+                                                .background(Color.black)
+                                                .foregroundColor(.white)
+                                                .cornerRadius(10)
+                                        }
+                                        NavigationLink(destination: ReportsView()) {
+                                            Text("All Reports")
                                                 .font(.headline)
                                                 .padding()
                                                 .frame(maxWidth: .infinity)
