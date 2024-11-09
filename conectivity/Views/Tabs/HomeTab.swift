@@ -252,7 +252,9 @@ struct HomeScreen: View {
                     let commentCount = dict["commentCount"] as? Int ?? 0
 
                     let likesDict = dict["likes"] as? [String: Bool] ?? [:]
-                    let likedByCurrentUser = likesDict[currentUserId!] ?? false
+//                    let likedByCurrentUser = likesDict[currentUserId!] ?? false
+                    let likedByCurrentUser = currentUserId != nil ? (likesDict[currentUserId!] ?? false) : false
+
 
                     let post = Post(
                         postId: postId,
@@ -345,14 +347,14 @@ struct HomeScreen: View {
     }
 
 
-    func updateCommentCount(for post: Post) {
-        let postRef = dbRef.child("posts").child(post.postId)
-        postRef.child("commentCount").setValue(post.commentCount + 1) { error, _ in
-            if let error = error {
-                print("Error updating comment count: \(error.localizedDescription)")
-            }
-        }
-    }
+//    func updateCommentCount(for post: Post) {
+//        let postRef = dbRef.child("posts").child(post.postId)
+//        postRef.child("commentCount").setValue(post.commentCount + 1) { error, _ in
+//            if let error = error {
+//                print("Error updating comment count: \(error.localizedDescription)")
+//            }
+//        }
+//    }
     func submitReport(for post: Post, reason: String) {
         // Check if reason is empty
         guard !reason.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
