@@ -14,6 +14,16 @@ struct SignInView: View {
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .padding(.top, 50)
+                
+                Image("logo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 120, height: 120)
+                    .clipShape(Circle())
+                    .overlay(Circle().stroke(Color.gray, lineWidth: 2))
+                    .shadow(radius: 5)
+                    .padding(.bottom, 20)
+
 
                 // Email Field
                 VStack(alignment: .leading) {
@@ -44,7 +54,7 @@ struct SignInView: View {
                         NavigationLink(destination: ForgotPasswordView()) {
                             Text("Forgot Password?")
                                 .font(.footnote)
-                                .foregroundColor(.blue)
+                                .foregroundColor(.black)
                         }
                     }
                 }
@@ -69,7 +79,7 @@ struct SignInView: View {
                         .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Color.blue)
+                        .background(Color.black)
                         .cornerRadius(10)
                 }
 
@@ -79,7 +89,7 @@ struct SignInView: View {
                     NavigationLink(destination: SignUpView()) {
                         Text("Sign Up")
                             .fontWeight(.bold)
-                            .foregroundColor(.blue)
+                            .foregroundColor(.black)
                     }
                 }
 

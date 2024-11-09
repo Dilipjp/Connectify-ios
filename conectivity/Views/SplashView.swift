@@ -15,7 +15,7 @@ struct SplashView: View {
             Text("Connectify")
                 .font(.largeTitle)
                 .bold()
-            Image("app_logo") // Add your logo here
+            Image("logo") // Add your logo here
                 .resizable()
                 .scaledToFit()
                 .frame(width: 200, height: 200)

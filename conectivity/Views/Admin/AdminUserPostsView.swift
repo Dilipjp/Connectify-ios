@@ -2,7 +2,8 @@
 //  AdminUserPostsView.swift
 //  conectivity
 //
-//  Created by suhas guturi on 2024-11-05.
+//  Created by Dilip on 2024-11-05.
+
 //
 
 import SwiftUI
@@ -155,6 +156,8 @@ public struct AdminUserPostsView: View {
                 secondaryButton: .cancel()
             )
         }
+        .navigationBarBackButtonHidden(true)
+
     }
 
     // Fetch posts belonging to the specified user
@@ -203,74 +206,73 @@ public struct AdminUserPostsView: View {
     }
 
     // Check if a post has warnings
-        private func checkForWarnings(postId: String) {
-            dbRef.child("users").child(userId).child("userWarnings")
-                .queryOrdered(byChild: "postId")
-                .queryEqual(toValue: postId)
-                .observeSingleEvent(of: .value) { snapshot in
-                    let hasWarning = snapshot.exists()
-                    DispatchQueue.main.async {
-                        self.postWarnings[postId] = hasWarning
-                    }
+    private func checkForWarnings(postId: String) {
+        dbRef.child("users").child(userId).child("userWarnings")
+            .queryOrdered(byChild: "postId")
+            .queryEqual(toValue: postId)
+            .observeSingleEvent(of: .value) { snapshot in
+                let hasWarning = snapshot.exists()
+                DispatchQueue.main.async {
+                    self.postWarnings[postId] = hasWarning
                 }
-        }
+            }
+    }
 
-        // Remove warning message
-        private func removeWarning(postId: String) {
-            dbRef.child("users").child(userId).child("userWarnings")
-                .queryOrdered(byChild: "postId")
-                .queryEqual(toValue: postId)
-                .observeSingleEvent(of: .value) { snapshot in
-                    if snapshot.exists() {
-                        for child in snapshot.children {
-                            if let snap = child as? DataSnapshot {
-                                snap.ref.removeValue { error, _ in
-                                    if let error = error {
-                                        print("Error removing warning: \(error.localizedDescription)")
-                                    } else {
-                                        print("Warning removed for post: \(postId)")
-                                        // Update the postWarnings dictionary
-                                        DispatchQueue.main.async {
-                                            self.postWarnings[postId] = false
-                                        }
+    // Remove warning message
+    private func removeWarning(postId: String) {
+        dbRef.child("users").child(userId).child("userWarnings")
+            .queryOrdered(byChild: "postId")
+            .queryEqual(toValue: postId)
+            .observeSingleEvent(of: .value) { snapshot in
+                if snapshot.exists() {
+                    for child in snapshot.children {
+                        if let snap = child as? DataSnapshot {
+                            snap.ref.removeValue { error, _ in
+                                if let error = error {
+                                    print("Error removing warning: \(error.localizedDescription)")
+                                } else {
+                                    print("Warning removed for post: \(postId)")
+                                    // Update the postWarnings dictionary
+                                    DispatchQueue.main.async {
+                                        self.postWarnings[postId] = false
                                     }
                                 }
                             }
                         }
                     }
                 }
-        }
-
-        // Send warning message
-        private func sendWarning(postId: String) {
-            let warningData: [String: Any] = [
-                "message": warningMessage,
-                "timestamp": Int(Date().timeIntervalSince1970 * 1000),
-                "postId": postId
-            ]
-            
-            dbRef.child("users").child(userId).child("userWarnings").childByAutoId().setValue(warningData) { error, _ in
-                if let error = error {
-                    print("Error sending warning: \(error.localizedDescription)")
-                } else {
-                    print("Warning sent to user: \(userId)")
-                    // Update the postWarnings dictionary
-                    DispatchQueue.main.async {
-                        self.postWarnings[postId] = true
-                    }
-                }
             }
-        }
+    }
 
-        // Delete post
-        private func deletePost(postId: String) {
-            dbRef.child("posts").child(postId).removeValue { error, _ in
-                if let error = error {
-                    print("Error deleting post: \(error.localizedDescription)")
-                } else {
-                    fetchUserPosts() // Refresh the posts after deletion
+    // Send warning message
+    private func sendWarning(postId: String) {
+        let warningData: [String: Any] = [
+            "message": warningMessage,
+            "timestamp": Int(Date().timeIntervalSince1970 * 1000),
+            "postId": postId
+        ]
+        
+        dbRef.child("users").child(userId).child("userWarnings").childByAutoId().setValue(warningData) { error, _ in
+            if let error = error {
+                print("Error sending warning: \(error.localizedDescription)")
+            } else {
+                print("Warning sent to user: \(userId)")
+                // Update the postWarnings dictionary
+                DispatchQueue.main.async {
+                    self.postWarnings[postId] = true
                 }
             }
         }
     }
 
+    // Delete post
+    private func deletePost(postId: String) {
+        dbRef.child("posts").child(postId).removeValue { error, _ in
+            if let error = error {
+                print("Error deleting post: \(error.localizedDescription)")
+            } else {
+                fetchUserPosts() // Refresh the posts after deletion
+            }
+        }
+    }
+}

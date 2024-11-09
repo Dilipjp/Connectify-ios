@@ -18,6 +18,13 @@ struct HomeScreen: View {
     @State private var showCommentSheet: Bool = false
     @State private var selectedPost: Post?
     @State private var newComment: String = ""
+    // Report-related states
+    @State private var showReportSheet: Bool = false
+    @State private var reportReason: String = ""
+    @State private var postToReport: Post?
+    @State private var reportSuccessMessage = ""
+    @State private var showReportSuccessMessage = false
+
 
     private var dbRef = Database.database().reference()
 
@@ -43,6 +50,14 @@ struct HomeScreen: View {
                                         .padding(.leading, 8)
 
                                     Spacer()
+                                    // Report Button
+                                                                       Button(action: {
+                                                                           postToReport = posts[index]
+                                                                           showReportSheet.toggle()
+                                                                       }) {
+                                                                           Image(systemName: "exclamationmark.triangle")
+                                                                               .foregroundColor(.red)
+                                                                       }
                                 }
                                 .padding(.horizontal, 10)
                                 .padding(.top, 5)
@@ -162,6 +177,40 @@ struct HomeScreen: View {
             .sheet(isPresented: $showShareSheet) {
                 ShareSheet(activityItems: [shareContent])
             }
+            .sheet(isPresented: $showReportSheet) {
+                            VStack {
+                                Text("Report Post")
+                                    .font(.title)
+                                    .padding()
+                                
+                                TextField("Reason for reporting...", text: $reportReason)
+                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    .padding()
+                                
+                                Button("Submit Report") {
+                                    if let post = postToReport {
+                                        submitReport(for: post, reason: reportReason)
+                                    }
+                                    showReportSheet = false
+                                    reportReason = ""
+                                }
+                                .padding()
+                                if showReportSuccessMessage {
+                                            Text(reportSuccessMessage)
+                                                .font(.subheadline)
+                                                .foregroundColor(.green)
+                                                .padding()
+                                                .onAppear {
+                                                    // Hide the message after a short delay
+                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                                                        showReportSuccessMessage = false
+                                                    }
+                                                }
+                                        }
+                            }
+                            .padding()
+                        }
+            
             .onAppear {
                 fetchPosts()  // Fetch posts when the view appears
             }
@@ -203,7 +252,9 @@ struct HomeScreen: View {
                     let commentCount = dict["commentCount"] as? Int ?? 0
 
                     let likesDict = dict["likes"] as? [String: Bool] ?? [:]
-                    let likedByCurrentUser = likesDict[currentUserId!] ?? false
+//                    let likedByCurrentUser = likesDict[currentUserId!] ?? false
+                    let likedByCurrentUser = currentUserId != nil ? (likesDict[currentUserId!] ?? false) : false
+
 
                     let post = Post(
                         postId: postId,
@@ -296,14 +347,45 @@ struct HomeScreen: View {
     }
 
 
-    func updateCommentCount(for post: Post) {
-        let postRef = dbRef.child("posts").child(post.postId)
-        postRef.child("commentCount").setValue(post.commentCount + 1) { error, _ in
+//    func updateCommentCount(for post: Post) {
+//        let postRef = dbRef.child("posts").child(post.postId)
+//        postRef.child("commentCount").setValue(post.commentCount + 1) { error, _ in
+//            if let error = error {
+//                print("Error updating comment count: \(error.localizedDescription)")
+//            }
+//        }
+//    }
+    func submitReport(for post: Post, reason: String) {
+        // Check if reason is empty
+        guard !reason.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            reportSuccessMessage = "Please provide a reason for reporting."
+            showReportSuccessMessage = true
+            return
+        }
+        
+        guard let currentUserId = Auth.auth().currentUser?.uid else { return }
+        
+        let reportId = dbRef.child("reports").childByAutoId().key ?? UUID().uuidString
+        let timestamp = Int64(Date().timeIntervalSince1970 * 1000)  // Save timestamp in milliseconds
+        
+        let reportData: [String: Any] = [
+            "postId": post.postId,
+            "userId": currentUserId,
+            "reason": reason,
+            "timestamp": timestamp
+        ]
+        
+        dbRef.child("reports").child(reportId).setValue(reportData) { error, _ in
             if let error = error {
-                print("Error updating comment count: \(error.localizedDescription)")
+                reportSuccessMessage = "Error submitting report: \(error.localizedDescription)"
+            } else {
+                reportSuccessMessage = "Report submitted successfully"
             }
+            showReportSuccessMessage = true
         }
     }
+
+
 }
 
 
